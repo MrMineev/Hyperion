@@ -6,6 +6,7 @@
 #include "chunk.h"
 #include "debug.h"
 #include "value.h"
+#include "compiler.h"
 
 #define DEBUG_TRACE_EXECUTION
 
@@ -111,10 +112,17 @@ static InterReport execute() {
 
 }
 
+/*
 InterReport interpret(Chunk *chunk) {
   hvm.chunk = chunk;
   hvm.ip = chunk->code;
   return execute();
+}
+*/
+
+InterReport interpret(const char* source) {
+  compile(source);
+  return INTER_OK;
 }
 
 #endif
