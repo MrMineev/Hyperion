@@ -33,6 +33,16 @@ int debug_instruction(Chunk *chunk, int offset) {
   switch (instruction) {
     case OP_RETURN:
       return simple_instruction("OP_RETURN", offset);
+    case OP_NEGATE:
+      return simple_instruction("OP_NEGATE", offset);
+    case OP_ADD:
+      return simple_instruction("OP_ADD", offset);
+    case OP_MINUS:
+      return simple_instruction("OP_MINUS", offset);
+    case OP_MULTI:
+      return simple_instruction("OP_MULTI", offset);
+    case OP_DIVIDE:
+      return simple_instruction("OP_DIVIDE", offset);
     case OP_CONSTANT:
       return constant_instruction("OP_CONSTANT", chunk, offset);
     default:

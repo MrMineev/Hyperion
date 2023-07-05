@@ -11,7 +11,12 @@
 
 typedef enum {
   OP_RETURN,
-  OP_CONSTANT
+  OP_CONSTANT,
+  OP_NEGATE,
+  OP_ADD,
+  OP_MINUS,
+  OP_MULTI,
+  OP_DIVIDE
 } Commands;
 
 typedef struct {
@@ -53,22 +58,6 @@ void free_chunk(Chunk *chunk) {
   FREE_ARRAY(int, chunk->lines, chunk->capacity);
   free_value_array(&chunk->constants);
   create_chunk(chunk);
-}
-
-void save_content_to_file(const char* filename, const char* text) {
-  FILE* file = fopen(filename, "w");
-  if (file != NULL) {
-    fputs(text, file);
-    fclose(file);
-  } else {
-    printf("Unable to save file %s\n", filename);
-  }
-}
-
-char* convert_to_text(Chunk *chunk) {
-}
-
-void save(Chunk *chunk, const char *filepath) {
 }
 
 #endif
