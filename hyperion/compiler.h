@@ -11,6 +11,8 @@
 #include "chunk.h"
 #include "HVM.h"
 
+#define DEBUG_PRINT_CODE
+
 typedef enum {
   PREC_NONE,
   PREC_ASSIGNMENT,  // =
@@ -104,7 +106,7 @@ static void emit_return() {
   emit_byte(OP_RETURN);
 }
 
-static uint8_t create_constant(double c) {
+static uint8_t create_constant(Value c) {
   int constant = add_constant(get_chunk_compiling(), c);
   if (constant > UINT8_MAX) {
     error("Too many constants in one chunk.");
@@ -114,12 +116,17 @@ static uint8_t create_constant(double c) {
   }
 }
 
-static void emit_constant(double c) {
+static void emit_constant(Value c) {
   emit_bytes(OP_CONSTANT, create_constant(c));
 }
 
 static void end_compiler() {
   emit_return();
+#ifdef DEBUG_PRINT_CODE
+  if (!parser.had_error) {
+    debug_chunk(get_chunk_compiling(), "code");
+  }
+#endif
 }
 
 static void expression();
@@ -132,11 +139,25 @@ static void binary() {
   parse_precedence((Precedence)(rule->precedence + 1));
 
   switch (operatorr) {
+    case TOKEN_BANG_EQUAL: emit_bytes(OP_EQUAL, OP_NOT); break;
+    case TOKEN_EQUAL_EQUAL: emit_byte(OP_EQUAL); break;
+    case TOKEN_GREATER: emit_byte(OP_GREATER); break;
+    case TOKEN_GREATER_EQUAL: emit_bytes(OP_LESS, OP_NOT); break;
+    case TOKEN_LESS: emit_byte(OP_LESS); break;
+    case TOKEN_LESS_EQUAL: emit_bytes(OP_GREATER, OP_NOT); break;
     case TOKEN_PLUS: emit_byte(OP_ADD); break;
     case TOKEN_MINUS: emit_byte(OP_MINUS); break;
     case TOKEN_STAR: emit_byte(OP_MULTI); break;
     case TOKEN_SLASH: emit_byte(OP_DIVIDE); break;
     default: return;
+  }
+}
+
+static void literal() {
+  switch (parser.previous.type) {
+    case TOKEN_FALSE: emit_byte(OP_FALSE); break;
+    case TOKEN_TRUE: emit_byte(OP_TRUE); break;
+    default: return; // Unreachable.
   }
 }
 
@@ -147,13 +168,14 @@ static void grouping() {
 
 static void number_c() {
   double value = strtod(parser.previous.start, NULL);
-  emit_constant(value);
+  emit_constant(NUMBER_VAL(value));
 }
 
 static void unary() {
   TokenType operatorr = parser.previous.type;
   parse_precedence(PREC_UNARY);
   switch (operatorr) {
+    case TOKEN_BANG: emit_byte(OP_NOT); break;
     case TOKEN_MINUS: emit_byte(OP_NEGATE); break;
     default: return;
   }
@@ -171,21 +193,21 @@ ParseRule rules[] = {
   [TOKEN_SEMICOLON]     = {NULL,     NULL,   PREC_NONE},
   [TOKEN_SLASH]         = {NULL,     binary, PREC_FACTOR},
   [TOKEN_STAR]          = {NULL,     binary, PREC_FACTOR},
-  [TOKEN_BANG]          = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_BANG_EQUAL]    = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_BANG]          = {unary,    NULL,   PREC_NONE},
+  [TOKEN_BANG_EQUAL]    = {NULL,     binary, PREC_EQUALITY},
   [TOKEN_EQUAL]         = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_EQUAL_EQUAL]   = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_GREATER]       = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_GREATER_EQUAL] = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_LESS]          = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_LESS_EQUAL]    = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_EQUAL_EQUAL]   = {NULL,     binary, PREC_EQUALITY},
+  [TOKEN_GREATER]       = {NULL,     binary, PREC_COMPARISON},
+  [TOKEN_GREATER_EQUAL] = {NULL,     binary, PREC_COMPARISON},
+  [TOKEN_LESS]          = {NULL,     binary, PREC_COMPARISON},
+  [TOKEN_LESS_EQUAL]    = {NULL,     binary, PREC_COMPARISON},
   [TOKEN_IDENTIFIER]    = {NULL,     NULL,   PREC_NONE},
   [TOKEN_STRING]        = {NULL,     NULL,   PREC_NONE},
   [TOKEN_NUMBER]        = {number_c, NULL,   PREC_NONE},
   [TOKEN_AND]           = {NULL,     NULL,   PREC_NONE},
   [TOKEN_CLASS]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_ELSE]          = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_FALSE]         = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_FALSE]         = {literal,  NULL,   PREC_NONE},
   [TOKEN_FOR]           = {NULL,     NULL,   PREC_NONE},
   [TOKEN_FUN]           = {NULL,     NULL,   PREC_NONE},
   [TOKEN_IF]            = {NULL,     NULL,   PREC_NONE},
@@ -194,7 +216,7 @@ ParseRule rules[] = {
   [TOKEN_RETURN]        = {NULL,     NULL,   PREC_NONE},
   [TOKEN_SUPER]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_THIS]          = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_TRUE]          = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_TRUE]          = {literal,  NULL,   PREC_NONE},
   [TOKEN_LET]           = {NULL,     NULL,   PREC_NONE},
   [TOKEN_WHILE]         = {NULL,     NULL,   PREC_NONE},
   [ILLEGAL]             = {NULL,     NULL,   PREC_NONE},

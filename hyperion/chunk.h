@@ -12,11 +12,17 @@
 typedef enum {
   OP_RETURN,
   OP_CONSTANT,
+  OP_TRUE,
+  OP_FALSE,
+  OP_NOT,
   OP_NEGATE,
   OP_ADD,
   OP_MINUS,
   OP_MULTI,
-  OP_DIVIDE
+  OP_DIVIDE,
+  OP_EQUAL,
+  OP_GREATER,
+  OP_LESS
 } Commands;
 
 typedef struct {

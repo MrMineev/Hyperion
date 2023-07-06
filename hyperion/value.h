@@ -6,7 +6,28 @@
 #include <stdint.h>
 #include <stdio.h>
 
-typedef double Value;
+typedef enum {
+  VAL_BOOL,
+  VAL_NIL, 
+  VAL_NUMBER,
+} ValueType;
+
+typedef typedef struct {
+  ValueType type;
+  union {
+    bool boolean;
+    double number;
+  } as; 
+} Value;
+
+#define IS_BOOL(value)    ((value).type == VAL_BOOL)
+#define IS_NUMBER(value)  ((value).type == VAL_NUMBER)
+
+#define AS_BOOL(value)    ((value).as.boolean)
+#define AS_NUMBER(value)  ((value).as.number)
+
+#define BOOL_VAL(value)   ((Value){VAL_BOOL, {.boolean = value}})
+#define NUMBER_VAL(value) ((Value){VAL_NUMBER, {.number = value}})
 
 typedef struct {
   int size;
@@ -36,7 +57,24 @@ void free_value_array(ValueArray *arr) {
 }
 
 void print_value(Value v) {
-  printf("%g", v);
+  switch (v.type) {
+    case VAL_BOOL:
+      printf(AS_BOOL(v) ? "true" : "false");
+      break;
+    case VAL_NUMBER:
+      printf("%g", AS_NUMBER(v));
+      break;
+  }
+}
+
+bool are_equal(Value a, Value b) {
+  if (a.type != b.type) return false;
+  switch (a.type) {
+    case VAL_BOOL: return AS_BOOL(a) == AS_BOOL(b);
+    case VAL_NIL: return true;
+    case VAL_NUMBER: return AS_NUMBER(a) == AS_NUMBER(b);
+    default: return false;
+  }
 }
 
 #endif
