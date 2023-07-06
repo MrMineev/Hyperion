@@ -112,18 +112,32 @@ static InterReport execute() {
 
 }
 
-/*
-InterReport interpret(Chunk *chunk) {
-  hvm.chunk = chunk;
-  hvm.ip = chunk->code;
-  return execute();
+InterReport interpret(const char *source) {
+  Chunk chunk;
+  create_chunk(&chunk);
+
+  if (!compile(source, &chunk)) {
+    free_chunk(&chunk);
+    return INTER_COMPILE_ERROR;
+  }
+
+  hvm.chunk = &chunk;
+  hvm.ip = hvm.chunk->code;
+
+  InterReport result = execute();
+  free_chunk(&chunk);
+
+  return result;
 }
-*/
+
+/*
 
 InterReport interpret(const char* source) {
   compile(source);
   return INTER_OK;
 }
+
+*/
 
 #endif
 
