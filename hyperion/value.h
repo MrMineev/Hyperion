@@ -5,29 +5,37 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
+
+typedef struct Obj Obj;
+typedef struct ObjString ObjString;
 
 typedef enum {
   VAL_BOOL,
-  VAL_NIL, 
   VAL_NUMBER,
+  VAL_OBJ
 } ValueType;
 
-typedef typedef struct {
+typedef struct {
   ValueType type;
   union {
     bool boolean;
     double number;
+    Obj *obj;
   } as; 
 } Value;
 
 #define IS_BOOL(value)    ((value).type == VAL_BOOL)
 #define IS_NUMBER(value)  ((value).type == VAL_NUMBER)
+#define IS_OBJ(value)     ((value).type == VAL_OBJ)
 
 #define AS_BOOL(value)    ((value).as.boolean)
 #define AS_NUMBER(value)  ((value).as.number)
+#define AS_OBJ(value)     ((value).as.obj)
 
 #define BOOL_VAL(value)   ((Value){VAL_BOOL, {.boolean = value}})
 #define NUMBER_VAL(value) ((Value){VAL_NUMBER, {.number = value}})
+#define OBJ_VAL(object)   ((Value){VAL_OBJ, {.obj = (Obj*)object}})
 
 typedef struct {
   int size;
@@ -35,46 +43,10 @@ typedef struct {
   Value* values;
 } ValueArray;
 
-void create_value_array(ValueArray *arr) {
-  arr->size = 0;
-  arr->capacity = 0;
-  arr->values = nullptr;
-}
-
-void write_value_array(ValueArray *arr, Value byte) {
-  if (arr->size + 1 > arr->capacity) {
-    int capacity = arr->capacity;
-    arr->capacity = GROW_CAPACITY(capacity);
-    arr->values = GROW_ARRAY(Value, arr->values, capacity, arr->capacity);
-  }
-  arr->values[arr->size] = byte;
-  arr->size++;
-}
-
-void free_value_array(ValueArray *arr) {
-  FREE_ARRAY(Value, arr->values, arr->capacity);
-  create_value_array(arr);
-}
-
-void print_value(Value v) {
-  switch (v.type) {
-    case VAL_BOOL:
-      printf(AS_BOOL(v) ? "true" : "false");
-      break;
-    case VAL_NUMBER:
-      printf("%g", AS_NUMBER(v));
-      break;
-  }
-}
-
-bool are_equal(Value a, Value b) {
-  if (a.type != b.type) return false;
-  switch (a.type) {
-    case VAL_BOOL: return AS_BOOL(a) == AS_BOOL(b);
-    case VAL_NIL: return true;
-    case VAL_NUMBER: return AS_NUMBER(a) == AS_NUMBER(b);
-    default: return false;
-  }
-}
+void create_value_array(ValueArray *arr);
+void write_value_array(ValueArray *arr, Value byte);
+void free_value_array(ValueArray *arr);
+void print_value(Value v);
+bool are_equal(Value a, Value b);
 
 #endif

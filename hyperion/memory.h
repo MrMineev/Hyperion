@@ -1,11 +1,14 @@
 #ifndef memory_h
 #define memory_h
 
-#include <cstdlib>
+#include <stdlib.h>
 
-int GROW_CAPACITY(int capacity) {
-  return (capacity < 8) ? 8 : capacity * 2;
-}
+#define ALLOCATE(type, count) \
+    (type*)reallocate(NULL, 0, sizeof(type) * (count))
+
+#define FREE(type, pointer) reallocate(pointer, sizeof(type), 0)
+
+int GROW_CAPACITY(int capacity);
 
 #define GROW_ARRAY(type, pointer, old_size, new_size) \
     (type*)reallocate(pointer, sizeof(type) * (old_size), sizeof(type) * (new_size))
@@ -13,16 +16,8 @@ int GROW_CAPACITY(int capacity) {
 #define FREE_ARRAY(type, pointer, old_size) \
     reallocate(pointer, sizeof(type) * (old_size), 0)
 
-void* reallocate(void* pointer, size_t old_size, size_t new_size) {
-  if (new_size == 0) {
-    free(pointer);
-    return NULL;
-  }
+void* reallocate(void* pointer, size_t old_size, size_t new_size);
 
-  void *result = realloc(pointer, new_size);
-  if (result == NULL) exit(1);
-  return result;
-}
-
+void free_objects();
 
 #endif
