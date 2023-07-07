@@ -7,4 +7,8 @@ To execute the bytecode you need to use the HVM (Hyperion Virtual Machine) will 
 
 1. For the start i won't be saving the bytecode anywhere i will just be executing it directly using the HVM (Hyperion Virtual Machine) without any JIT. Then after i build a good language i will build the separate HVM with a JIT.
 
+## TODO
+
+- [ ] Implement the worlds fastest hash table algorithm (https://probablydance.com/2017/02/26/i-wrote-the-fastest-hashtable/)
+
 
