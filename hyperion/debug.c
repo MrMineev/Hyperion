@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include "chunk.h"
+#include "debug.h"
 
 int simple_instruction(const char* op_command, int offset) {
   printf("%s\n", op_command);

@@ -3,6 +3,7 @@
 #include "object.h"
 #include "debug.h"
 #include "compiler.h"
+#include "table.h"
 
 #include <stdarg.h>
 
@@ -28,10 +29,12 @@ static void runtime_error(const char* format, ...) {
 void init_hvm() {
   init_stack();
   hvm.objects = NULL;
+  init_table(&hvm.strings);
 }
 
 void free_hvm() {
   free_objects();
+  free_table(&hvm.strings);
 }
 
 void push(Value value) {

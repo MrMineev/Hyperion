@@ -40,6 +40,9 @@ void print_value(Value v) {
     case VAL_NUMBER:
       printf("%g", AS_NUMBER(v));
       break;
+    case VAL_NIL:
+      printf("nil");
+      break;
   }
 }
 
@@ -48,12 +51,8 @@ bool are_equal(Value a, Value b) {
   switch (a.type) {
     case VAL_BOOL: return AS_BOOL(a) == AS_BOOL(b);
     case VAL_NUMBER: return AS_NUMBER(a) == AS_NUMBER(b);
-    case VAL_OBJ: {
-      ObjString* aString = AS_STRING(a);
-      ObjString* bString = AS_STRING(b);
-      return aString->size == bString->size &&
-          memcmp(aString->chars, bString->chars, aString->size) == 0;
-    }
+    case VAL_OBJ: return AS_OBJ(a) == AS_OBJ(b);
+    case VAL_NIL: return true;
     default: return false;
   }
 }

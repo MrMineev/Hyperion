@@ -6,6 +6,7 @@
 
 #include "object.h"
 #include "chunk.h"
+#include "table.h"
 
 #define DEBUG_TRACE_EXECUTION
 
@@ -17,6 +18,7 @@ typedef struct {
   Value stack[STACK_MAX];
   Value* top;
   Obj* objects;
+  Table strings;
 } HVM;
 
 typedef enum {
