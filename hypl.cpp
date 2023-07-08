@@ -29,8 +29,10 @@ static void repl() {
     print_colorful('P', COLOR_YELLOW);
     print_colorful('L', COLOR_YELLOW);
     print_colorful(']', COLOR_YELLOW);
-    print_colorful('-', COLOR_YELLOW);
-    print_colorful('>', COLOR_YELLOW);
+    print_colorful(' ', COLOR_YELLOW);
+    print_colorful('-', COLOR_RED);
+    print_colorful('-', COLOR_RED);
+    print_colorful('>', COLOR_RED);
     print_colorful(' ', COLOR_YELLOW);
 
     if (!fgets(line, sizeof(line), stdin)) {

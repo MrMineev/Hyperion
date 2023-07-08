@@ -30,11 +30,13 @@ void init_hvm() {
   init_stack();
   hvm.objects = NULL;
   init_table(&hvm.strings);
+  init_table(&hvm.globals);
 }
 
 void free_hvm() {
   free_objects();
   free_table(&hvm.strings);
+  free_table(&hvm.globals);
 }
 
 void push(Value value) {
@@ -73,6 +75,7 @@ static InterReport execute() {
 
 #define READ_BYTE() (*hvm.ip++)
 #define READ_CONSTANT() (hvm.chunk->constants.values[READ_BYTE()])
+#define READ_STRING() AS_STRING(READ_CONSTANT())
 #define BINARY_OP(valueType, op) \
   do { \
     if (!IS_NUMBER(peek_c(0)) || !IS_NUMBER(peek_c(1))) { \
@@ -85,7 +88,6 @@ static InterReport execute() {
   } while (false)
 
   while (true) {
-
 #ifdef DEBUG_TRACE_EXECUTION
     printf("\t");
     for (Value* pancake = hvm.stack; pancake < hvm.top; pancake++) {
@@ -94,7 +96,9 @@ static InterReport execute() {
       printf(" ]");
     }
     printf("\n");
+
     debug_instruction(hvm.chunk, (int)(hvm.ip - hvm.chunk->code));
+
 #endif
 
     uint8_t instruction;
@@ -102,6 +106,40 @@ static InterReport execute() {
       case OP_CONSTANT: {
         Value constant = READ_CONSTANT();
         push(constant);
+        break;
+      }
+      case OP_PRINT: {
+        print_value(pop());
+        printf("\n");
+        break;
+      }
+      case OP_POP: {
+        pop();
+        break;               
+      }
+      case OP_DEFINE_GLOBAL: {
+        ObjString* name = READ_STRING();
+        set_table(&hvm.globals, name, peek_c(0));
+        pop();
+        break;
+      }
+      case OP_GET_GLOBAL: {
+        ObjString* name = READ_STRING();
+        Value value;
+        if (!table_get(&hvm.globals, name, &value)) {
+          runtime_error("Undefined variable '%s'.", name->chars);
+          return INTER_RUNTIME_ERROR;
+        }
+        push(value);
+        break;
+      }
+      case OP_SET_GLOBAL: {
+        ObjString* name = READ_STRING();
+        if (set_table(&hvm.globals, name, peek_c(0))) {
+          table_delete(&hvm.globals, name); 
+          runtime_error("Undefined variable '%s'.", name->chars);
+          return INTER_RUNTIME_ERROR;
+        }
         break;
       }
       case OP_NOT: {
@@ -168,6 +206,8 @@ static InterReport execute() {
   }
 
 #undef READ_CONSTANT
+#undef READ_STRING
+#undef BINARY_OP
 #undef READ_BYTE
 
 }
@@ -185,6 +225,7 @@ InterReport interpret(const char *source) {
   hvm.ip = hvm.chunk->code;
 
   InterReport result = execute();
+
   free_chunk(&chunk);
 
   return result;
