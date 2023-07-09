@@ -198,8 +198,6 @@ static InterReport execute() {
         break;
       }
       case OP_RETURN: {
-        print_value(pop());
-        printf("\n");
         return INTER_OK;
       }
     }
