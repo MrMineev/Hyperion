@@ -80,6 +80,7 @@ bool set_table(Table *table, ObjString *key, Value value) {
   if (is_new && IS_NIL(entry->value)) table->size++;
 
   entry->key = key;
+  entry->value = value;
 
   return is_new;
 }

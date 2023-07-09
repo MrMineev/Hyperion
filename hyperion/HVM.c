@@ -29,14 +29,15 @@ static void runtime_error(const char* format, ...) {
 void init_hvm() {
   init_stack();
   hvm.objects = NULL;
-  init_table(&hvm.strings);
   init_table(&hvm.globals);
+  init_table(&hvm.strings);
 }
 
 void free_hvm() {
-  free_objects();
-  free_table(&hvm.strings);
   free_table(&hvm.globals);
+  free_table(&hvm.strings);
+
+  free_objects();
 }
 
 void push(Value value) {
