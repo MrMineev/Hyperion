@@ -118,6 +118,16 @@ static InterReport execute() {
         pop();
         break;               
       }
+      case OP_GET_LOCAL: {
+        uint8_t slot = READ_BYTE();
+        push(hvm.stack[slot]); 
+        break;
+      }
+      case OP_SET_LOCAL: {
+        uint8_t slot = READ_BYTE();
+        hvm.stack[slot] = peek_c(0);
+        break;
+      }
       case OP_DEFINE_GLOBAL: {
         ObjString* name = READ_STRING();
         set_table(&hvm.globals, name, peek_c(0));

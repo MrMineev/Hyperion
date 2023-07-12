@@ -19,6 +19,12 @@ int constant_instruction(const char* op_command, Chunk *chunk, int offset) {
   return offset + 2;
 }
 
+static int byte_instruction(const char* name, Chunk* chunk, int offset) {
+  uint8_t slot = chunk->code[offset + 1];
+  printf("%-16s %4d\n", name, slot);
+  return offset + 2; 
+}
+
 int debug_instruction(Chunk *chunk, int offset) {
   printf("%04d ", offset);
   if (offset > 0 && chunk->lines[offset] == chunk->lines[offset - 1]) {
@@ -35,6 +41,10 @@ int debug_instruction(Chunk *chunk, int offset) {
       return simple_instruction("OP_PRINT", offset);
     case OP_POP:
       return simple_instruction("OP_POP", offset);
+    case OP_GET_LOCAL:
+      return byte_instruction("OP_GET_LOCAL", chunk, offset);
+    case OP_SET_LOCAL:
+      return byte_instruction("OP_SET_LOCAL", chunk, offset);
     case OP_DEFINE_GLOBAL:
       return constant_instruction("OP_DEFINE_GLOBAL", chunk, offset);
     case OP_GET_GLOBAL:
@@ -76,3 +86,4 @@ void debug_chunk(Chunk* chunk, const char* name) {
     offset = debug_instruction(chunk, offset);
   }
 }
+
