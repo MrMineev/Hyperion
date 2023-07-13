@@ -128,6 +128,11 @@ static InterReport execute() {
         hvm.ip += offset;
         break;
       }
+      case OP_LOOP: {
+        uint16_t offset = READ_SHORT();
+        hvm.ip -= offset;
+        break;
+      }
       case OP_POP: {
         pop();
         break;               

@@ -43,6 +43,8 @@ int debug_instruction(Chunk *chunk, int offset) {
 
   uint8_t instruction = chunk->code[offset];
   switch (instruction) {
+    case OP_LOOP:
+      return jump_instruction("OP_LOOP", -1, chunk, offset);
     case OP_JUMP:
       return jump_instruction("OP_JUMP", 1, chunk, offset);
     case OP_JUMP_IF_FALSE:

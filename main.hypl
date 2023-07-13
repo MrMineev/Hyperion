@@ -1,8 +1,5 @@
-let a = 5;
-let b = 7;
-
-if (a + b == 11 or a - b == -2) {
-  print a + b;
-} else {
-  print "A + B != 11";
+let a = 0;
+for (let i = 0; i < 10; i = i + 1) {
+  a = a + i;
 }
+print a;

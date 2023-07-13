@@ -127,6 +127,16 @@ static void emit_bytes(uint8_t byte1, uint8_t byte2) {
   emit_byte(byte2);
 }
 
+static void emit_loop(int loop_start) {
+  emit_byte(OP_LOOP);
+
+  int offset = get_chunk_compiling()->size - loop_start + 2;
+  if (offset > UINT16_MAX) error("Loop body too large.");
+
+  emit_byte((offset >> 8) & 0xff);
+  emit_byte(offset & 0xff);
+}
+
 static int emit_jump(uint8_t instruction) {
   emit_byte(instruction);
   emit_byte(0xff);
@@ -468,6 +478,51 @@ static void expression_stmt() {
   emit_byte(OP_POP);
 }
 
+static void for_statement() {
+  init_scope();
+  consume(TOKEN_LEFT_PAREN, "Expect '(' after 'for'.");
+  if (match(TOKEN_SEMICOLON)) {
+    // No initializer.
+  } else if (match(TOKEN_LET)) {
+    variable_declaration();
+  } else {
+    expression_stmt();
+  }
+
+  int loop_start = get_chunk_compiling()->size;
+  int exit_jump = -1;
+  if (!match(TOKEN_SEMICOLON)) {
+    expression();
+    consume(TOKEN_SEMICOLON, "Expect ';' after loop condition.");
+
+    // Jump out of the loop if the condition is false.
+    exit_jump = emit_jump(OP_JUMP_IF_FALSE);
+    emit_byte(OP_POP); // Condition.
+  }
+
+  if (!match(TOKEN_RIGHT_PAREN)) {
+    int body_jump = emit_jump(OP_JUMP);
+    int increment_start = get_chunk_compiling()->size;
+    expression();
+    emit_byte(OP_POP);
+    consume(TOKEN_RIGHT_PAREN, "Expect ')' after for clauses.");
+
+    emit_loop(loop_start);
+    loop_start = increment_start;
+    patch_jump(body_jump);
+  }
+
+  statement();
+  emit_loop(loop_start);
+
+  if (exit_jump != -1) {
+    patch_jump(exit_jump);
+    emit_byte(OP_POP); // Condition.
+  }
+
+  destroy_scope();
+}
+
 static void if_statement() {
   consume(TOKEN_LEFT_PAREN, "Expect '(' after 'if'.");
   expression();
@@ -492,6 +547,22 @@ static void print_stmt() {
   expression();
   consume(TOKEN_SEMICOLON, "Expect ';' after value");
   emit_byte(OP_PRINT);
+}
+
+static void while_statement() {
+  int loop_start = get_chunk_compiling()->size;
+  consume(TOKEN_LEFT_PAREN, "Expect '(' after 'while'.");
+  expression();
+  consume(TOKEN_RIGHT_PAREN, "Expect ')' after condition.");
+
+  int exit_jump = emit_jump(OP_JUMP_IF_FALSE);
+  emit_byte(OP_POP);
+  statement();
+
+  emit_loop(loop_start);
+
+  patch_jump(exit_jump);
+  emit_byte(OP_POP);
 }
 
 static void synchronize() {
@@ -528,6 +599,10 @@ static void declaration() {
 static void statement() {
   if (match(TOKEN_PRINT)) {
     print_stmt();
+  } else if (match(TOKEN_FOR)) {
+    for_statement();
+  } else if (match(TOKEN_WHILE)) {
+    while_statement();
   } else if (match(TOKEN_IF)) {
     if_statement();
   } else if (match(TOKEN_LEFT_BRACE)) {
