@@ -1,3 +1,5 @@
+![Logo](logo/logo.png)
+
 # 🌓 Hyperion
 
 The goal is to build a compiler called Hyperion that would compile to bytecode.
