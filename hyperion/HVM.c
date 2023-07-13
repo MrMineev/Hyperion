@@ -77,6 +77,8 @@ static InterReport execute() {
 #define READ_BYTE() (*hvm.ip++)
 #define READ_CONSTANT() (hvm.chunk->constants.values[READ_BYTE()])
 #define READ_STRING() AS_STRING(READ_CONSTANT())
+#define READ_SHORT() \
+    (hvm.ip += 2, (uint16_t)((hvm.ip[-2] << 8) | hvm.ip[-1]))
 #define BINARY_OP(valueType, op) \
   do { \
     if (!IS_NUMBER(peek_c(0)) || !IS_NUMBER(peek_c(1))) { \
@@ -112,6 +114,18 @@ static InterReport execute() {
       case OP_PRINT: {
         print_value(pop());
         printf("\n");
+        break;
+      }
+      case OP_JUMP_IF_FALSE: {
+        uint16_t offset = READ_SHORT();
+        if (isFalsey(peek_c(0))) {
+          hvm.ip += offset;
+        }
+        break;
+      }
+      case OP_JUMP: {
+        uint16_t offset = READ_SHORT();
+        hvm.ip += offset;
         break;
       }
       case OP_POP: {
@@ -218,6 +232,7 @@ static InterReport execute() {
 #undef READ_STRING
 #undef BINARY_OP
 #undef READ_BYTE
+#undef READ_SHORT
 
 }
 
