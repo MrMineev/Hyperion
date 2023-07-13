@@ -1,7 +1,7 @@
 let a = 5;
 let b = 7;
 
-if (a + b == 11) {
+if (a + b == 11 or a - b == -2) {
   print a + b;
 } else {
   print "A + B != 11";
