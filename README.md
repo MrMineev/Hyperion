@@ -13,4 +13,6 @@ To execute the bytecode you need to use the HVM (Hyperion Virtual Machine) will 
 
 - [ ] Implement the worlds fastest hash table algorithm (https://probablydance.com/2017/02/26/i-wrote-the-fastest-hashtable/)
 
+- [ ] Being able to get value of variable by a string of it's name.
+
 
