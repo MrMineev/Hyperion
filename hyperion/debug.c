@@ -7,39 +7,41 @@
 #include "debug.h"
 
 int simple_instruction(const char* op_command, int offset) {
-  printf("%s\n", op_command);
+  // printf("%s\n", op_command);
   return offset + 1;
 }
 
 int constant_instruction(const char* op_command, Chunk *chunk, int offset) {
   uint8_t constant = chunk->code[offset + 1];
-  printf("%-16s %4d '", op_command, constant);
-  print_value(chunk->constants.values[constant]);
-  printf("'\n");
+  // printf("%-16s %4d '", op_command, constant);
+  // print_value(chunk->constants.values[constant]);
+  // printf("'\n");
   return offset + 2;
 }
 
 static int byte_instruction(const char* name, Chunk* chunk, int offset) {
   uint8_t slot = chunk->code[offset + 1];
-  printf("%-16s %4d\n", name, slot);
+  // printf("%-16s %4d\n", name, slot);
   return offset + 2; 
 }
 
 static int jump_instruction(const char* name, int sign, Chunk* chunk, int offset) {
   uint16_t jump = (uint16_t)(chunk->code[offset + 1] << 8);
   jump |= chunk->code[offset + 2];
-  printf("%-16s %4d -> %d\n", name, offset, offset + 3 + sign * jump);
+  // printf("%-16s %4d -> %d\n", name, offset, offset + 3 + sign * jump);
   return offset + 3;
 }
 
 
 int debug_instruction(Chunk *chunk, int offset) {
+  /*
   printf("%04d ", offset);
   if (offset > 0 && chunk->lines[offset] == chunk->lines[offset - 1]) {
     printf("   | ");
   } else {
     printf("%4d ", chunk->lines[offset]);
   }
+  */
 
   uint8_t instruction = chunk->code[offset];
   switch (instruction) {
@@ -96,7 +98,7 @@ int debug_instruction(Chunk *chunk, int offset) {
 }
 
 void debug_chunk(Chunk* chunk, const char* name) {
-  printf("== %s ==\n", name);
+  // printf("== %s ==\n", name);
 
   for (int offset = 0; offset < chunk->size;) {
     offset = debug_instruction(chunk, offset);

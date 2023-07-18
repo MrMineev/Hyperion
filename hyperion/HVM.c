@@ -92,6 +92,7 @@ static InterReport execute() {
 
   while (true) {
 #ifdef DEBUG_TRACE_EXECUTION
+    /*
     printf("\t");
     for (Value* pancake = hvm.stack; pancake < hvm.top; pancake++) {
       printf("[ ");
@@ -99,6 +100,7 @@ static InterReport execute() {
       printf(" ]");
     }
     printf("\n");
+    */
 
     debug_instruction(hvm.chunk, (int)(hvm.ip - hvm.chunk->code));
 
