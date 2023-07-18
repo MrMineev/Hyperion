@@ -278,6 +278,19 @@ static InterReport execute() {
         BINARY_OP(NUMBER_VAL, -);
         break;
       }
+      case OP_MODULE: {
+        do {
+          if (!IS_NUMBER(peek_c(0)) || !IS_NUMBER(peek_c(1))) {
+            runtime_error("Operands must be numbers.");
+            return INTER_RUNTIME_ERROR;
+          }
+          int b = (int) AS_NUMBER(pop());
+          int a = (int) AS_NUMBER(pop());
+          double res = (double) (a % b);
+          push(NUMBER_VAL(res));
+        } while (false);
+        break;
+      }
       case OP_MULTI: {
         BINARY_OP(NUMBER_VAL, *);
         break;
