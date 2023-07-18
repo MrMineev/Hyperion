@@ -446,7 +446,17 @@ static ParseRule* get_rule(TokenType type) {
   return &rules[type];
 }
 
+static void inc_stmt();
+static void decr_stmt();
+
 static void expression() {
+  if (match(TOKEN_INC)) {
+    inc_stmt();
+    return;
+  } else if (match(TOKEN_DECR)) {
+    decr_stmt();
+    return;
+  }
   parse_precedence(PREC_ASSIGNMENT);
 }
 
@@ -594,6 +604,59 @@ static void declaration() {
   }
 
   if (parser.panic_mode) synchronize();
+}
+
+static void decr_stmt() {
+  if (match(TOKEN_IDENTIFIER)) {
+    uint8_t getOp, setOp;
+    int arg = resolve_local(current, &parser.previous);
+    if (arg != -1) {
+      getOp = OP_GET_LOCAL;
+      setOp = OP_SET_LOCAL;
+    } else {
+      arg = identifier_constant(&parser.previous);
+      getOp = OP_GET_GLOBAL;
+      setOp = OP_SET_GLOBAL;
+    }
+
+    emit_bytes(getOp, arg);
+    emit_bytes(OP_CONSTANT, create_constant(NUMBER_VAL(-1)));
+    emit_byte(OP_ADD);
+    emit_bytes(setOp, arg);
+  } else {
+    error("Expect variable name.");
+  }
+}
+
+static void inc_stmt() {
+  if (match(TOKEN_IDENTIFIER)) {
+    uint8_t getOp, setOp;
+    int arg = resolve_local(current, &parser.previous);
+    if (arg != -1) {
+      getOp = OP_GET_LOCAL;
+      setOp = OP_SET_LOCAL;
+    } else {
+      arg = identifier_constant(&parser.previous);
+      getOp = OP_GET_GLOBAL;
+      setOp = OP_SET_GLOBAL;
+    }
+
+    emit_bytes(getOp, arg);
+    emit_bytes(OP_CONSTANT, create_constant(NUMBER_VAL(1)));
+    emit_byte(OP_ADD);
+    emit_bytes(setOp, arg);
+  } else {
+    error("Expect variable name.");
+  }
+
+  /*
+  uint8_t global = parse_variable("Expect variable name.");
+
+  emit_bytes(OP_GET_GLOBAL, global);
+  emit_bytes(OP_CONSTANT, create_constant(NUMBER_VAL(1)));
+  emit_byte(OP_ADD);
+  emit_bytes(OP_SET_GLOBAL, global);
+  */
 }
 
 static void statement() {

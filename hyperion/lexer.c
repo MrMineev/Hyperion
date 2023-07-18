@@ -122,7 +122,19 @@ static TokenType identifierType() {
         }
       }
       break;
-    case 'i': return search_keyword(1, 1, "f", TOKEN_IF);
+    case 'd':
+      if (lexer.current - lexer.start > 1) {
+        switch (lexer.start[1]) {
+          case 'e': return search_keyword(2, 2, "cr", TOKEN_DECR);
+        }
+      }
+    case 'i':
+      if (lexer.current - lexer.start > 2 &&
+          lexer.start[1] == 'n' &&
+          lexer.start[2] == 'c') {
+        return TOKEN_INC;
+      }
+      return search_keyword(1, 1, "f", TOKEN_IF);
     case 'o': return search_keyword(1, 1, "r", TOKEN_OR);
     case 'p': return search_keyword(1, 4, "rint", TOKEN_PRINT);
     case 'r': return search_keyword(1, 5, "eturn", TOKEN_RETURN);

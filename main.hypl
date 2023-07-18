@@ -1,6 +1,5 @@
 let sum = 0;
-for (let i = 0; i < 10; inc i) {
+for (let i = 10; i > -1; decr i) {
   sum = sum + i;
 }
 print sum;
-
