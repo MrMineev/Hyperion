@@ -11,6 +11,7 @@ HVM hvm;
 
 static void init_stack() {
   hvm.top = hvm.stack;
+  hvm.frameCount = 0;
 }
 
 static void runtime_error(const char* format, ...) {
@@ -20,9 +21,18 @@ static void runtime_error(const char* format, ...) {
   va_end(args);
   fputs("\n", stderr);
 
-  size_t instruction = hvm.ip - hvm.chunk->code - 1;
-  int line = hvm.chunk->lines[instruction];
-  fprintf(stderr, "[line %d] in script\n", line);
+  for (int i = hvm.frameCount - 1; i >= 0; i--) {
+    CallFrame* frame = &hvm.frames[i];
+    ObjFunction* function = frame->function;
+    size_t instruction = frame->ip - function->chunk.code - 1;
+    fprintf(stderr, "[line %d] in ", function->chunk.lines[instruction]);
+    if (function->name == NULL) {
+      fprintf(stderr, "script\n");
+    } else {
+      fprintf(stderr, "%s()\n", function->name->chars);
+    }
+  }
+
   init_stack();
 }
 
@@ -54,6 +64,37 @@ static Value peek_c(int distance) {
   return hvm.top[-1 - distance];
 }
 
+static bool call(ObjFunction* function, int argCount) {
+  if (argCount != function->arity) {
+    runtime_error("Expected %d arguments but got %d.", function->arity, argCount);
+    return false;
+  }
+
+  if (hvm.frameCount == FRAMES_MAX) {
+    runtime_error("Stack overflow.");
+    return false;
+  }
+
+  CallFrame* frame = &hvm.frames[hvm.frameCount++];
+  frame->function = function;
+  frame->ip = function->chunk.code;
+  frame->slots = hvm.top - argCount - 1;
+  return true;
+}
+
+static bool call_value(Value callee, int cnt) {
+  if (IS_OBJ(callee)) {
+    switch (OBJ_TYPE(callee)) {
+      case OBJ_FUNCTION: 
+        return call(AS_FUNCTION(callee), cnt);
+      default:
+        break;
+    }
+  }
+  runtime_error("Can only call functions and classes.");
+  return false;
+}
+
 static bool isFalsey(Value value) {
   return (IS_BOOL(value) && !AS_BOOL(value));
 }
@@ -73,12 +114,18 @@ static void concatenate() {
 }
 
 static InterReport execute() {
+  CallFrame* frame = &hvm.frames[hvm.frameCount - 1];
 
-#define READ_BYTE() (*hvm.ip++)
-#define READ_CONSTANT() (hvm.chunk->constants.values[READ_BYTE()])
-#define READ_STRING() AS_STRING(READ_CONSTANT())
+#define READ_BYTE() (*frame->ip++)
+
 #define READ_SHORT() \
-    (hvm.ip += 2, (uint16_t)((hvm.ip[-2] << 8) | hvm.ip[-1]))
+    (frame->ip += 2, \
+    (uint16_t)((frame->ip[-2] << 8) | frame->ip[-1]))
+
+#define READ_CONSTANT() \
+    (frame->function->chunk.constants.values[READ_BYTE()])
+
+#define READ_STRING() AS_STRING(READ_CONSTANT())
 #define BINARY_OP(valueType, op) \
   do { \
     if (!IS_NUMBER(peek_c(0)) || !IS_NUMBER(peek_c(1))) { \
@@ -102,7 +149,8 @@ static InterReport execute() {
     printf("\n");
     */
 
-    debug_instruction(hvm.chunk, (int)(hvm.ip - hvm.chunk->code));
+    debug_instruction(&frame->function->chunk,
+        (int)(frame->ip - frame->function->chunk.code));
 
 #endif
 
@@ -118,21 +166,27 @@ static InterReport execute() {
         printf("\n");
         break;
       }
+      case OP_CALL: {
+        int cnt = READ_BYTE();
+        if (!call_value(peek_c(cnt), cnt)) {
+          return INTER_RUNTIME_ERROR;
+        }
+        frame = &hvm.frames[hvm.frameCount - 1];
+        break;
+      }
       case OP_JUMP_IF_FALSE: {
         uint16_t offset = READ_SHORT();
-        if (isFalsey(peek_c(0))) {
-          hvm.ip += offset;
-        }
+        if (isFalsey(peek_c(0))) frame->ip += offset;
         break;
       }
       case OP_JUMP: {
         uint16_t offset = READ_SHORT();
-        hvm.ip += offset;
+        frame->ip += offset;
         break;
       }
       case OP_LOOP: {
         uint16_t offset = READ_SHORT();
-        hvm.ip -= offset;
+        frame->ip -= offset;
         break;
       }
       case OP_POP: {
@@ -141,12 +195,12 @@ static InterReport execute() {
       }
       case OP_GET_LOCAL: {
         uint8_t slot = READ_BYTE();
-        push(hvm.stack[slot]); 
+        push(frame->slots[slot]);
         break;
       }
       case OP_SET_LOCAL: {
         uint8_t slot = READ_BYTE();
-        hvm.stack[slot] = peek_c(0);
+        frame->slots[slot] = peek_c(0);
         break;
       }
       case OP_DEFINE_GLOBAL: {
@@ -192,6 +246,9 @@ static InterReport execute() {
       case OP_FALSE:
         push(BOOL_VAL(false));
         break;
+      case OP_NIL:
+        push(NIL_VAL);
+        break;
       case OP_EQUAL: {
         Value b = pop();
         Value a = pop();
@@ -230,7 +287,16 @@ static InterReport execute() {
         break;
       }
       case OP_RETURN: {
-        return INTER_OK;
+        Value result = pop();
+        hvm.frameCount--;
+        if (hvm.frameCount == 0) {
+          pop();
+          return INTER_OK;
+        }
+        hvm.top = frame->slots;
+        push(result);
+        frame = &hvm.frames[hvm.frameCount - 1];
+        break;
       }
     }
   }
@@ -244,22 +310,13 @@ static InterReport execute() {
 }
 
 InterReport interpret(const char *source) {
-  Chunk chunk;
-  create_chunk(&chunk);
+  ObjFunction* function = compile(source);
+  if (function == NULL) return INTER_COMPILE_ERROR;
 
-  if (!compile(source, &chunk)) {
-    free_chunk(&chunk);
-    return INTER_COMPILE_ERROR;
-  }
+  push(OBJ_VAL(function));
+  call(function, 0);
 
-  hvm.chunk = &chunk;
-  hvm.ip = hvm.chunk->code;
-
-  InterReport result = execute();
-
-  free_chunk(&chunk);
-
-  return result;
+  return execute();
 }
 
 

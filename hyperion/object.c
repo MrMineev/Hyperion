@@ -6,6 +6,7 @@
 #include "value.h"
 #include "table.h"
 #include "HVM.h"
+#include "chunk.h"
 
 #define ALLOCATE_OBJ(type, objectType) (type*)allocate_object(sizeof(type), objectType)
 
@@ -15,6 +16,14 @@ static Obj* allocate_object(size_t size, ObjType type) {
   object->next = hvm.objects;
   hvm.objects = object;
   return object;
+}
+
+ObjFunction* create_function() {
+  ObjFunction *obj_func = ALLOCATE_OBJ(ObjFunction, OBJ_FUNCTION);
+  obj_func->arity = 0;
+  obj_func->name = NULL;
+  create_chunk(&obj_func->chunk);
+  return obj_func;
 }
 
 static ObjString* allocate_string(char* chars, int size, uint32_t hash) {
@@ -57,10 +66,21 @@ ObjString* copy_string(const char* chars, int size) {
   return allocate_string(heap_chars, size, hash);
 }
 
+void print_function(ObjFunction *func) {
+  if (func->name == NULL) {
+    printf("<script>");
+    return;
+  }
+  printf("<fn %s>", func->name->chars);
+}
+
 void print_object(Value value) {
   switch (OBJ_TYPE(value)) {
     case OBJ_STRING:
       printf("%s", AS_CSTRING(value));
+      break;
+    case OBJ_FUNCTION:
+      print_function(AS_FUNCTION(value));
       break;
   }
 }
