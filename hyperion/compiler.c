@@ -776,6 +776,9 @@ static void decr_stmt() {
     if (arg != -1) {
       getOp = OP_GET_LOCAL;
       setOp = OP_SET_LOCAL;
+    } else if ((arg = resolve_upvalue(current, &parser.previous)) != -1) {
+      getOp = OP_GET_UPVALUE;
+      setOp = OP_SET_UPVALUE;
     } else {
       arg = identifier_constant(&parser.previous);
       getOp = OP_GET_GLOBAL;
@@ -798,6 +801,9 @@ static void inc_stmt() {
     if (arg != -1) {
       getOp = OP_GET_LOCAL;
       setOp = OP_SET_LOCAL;
+    } else if ((arg = resolve_upvalue(current, &parser.previous)) != -1) {
+      getOp = OP_GET_UPVALUE;
+      setOp = OP_SET_UPVALUE;
     } else {
       arg = identifier_constant(&parser.previous);
       getOp = OP_GET_GLOBAL;

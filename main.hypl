@@ -1,15 +1,14 @@
 fun outer() {
-  let x = "value";
+  let x = 10;
   fun middle() {
     fun inner() {
+      inc x;
       print x;
     }
 
-    print "create inner closure";
     return inner;
   }
 
-  print "return from outer";
   return middle;
 }
 
