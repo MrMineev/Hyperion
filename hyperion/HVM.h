@@ -26,12 +26,19 @@ typedef struct {
   CallFrame frames[FRAMES_MAX];
   int frameCount;
 
+  size_t bytes_alloc;
+  size_t next_gc_limit;
+
   Value stack[STACK_MAX];
   Value* top;
   ObjUpvalue* openUpvalues;
   Obj* objects;
   Table globals;
   Table strings;
+
+  int gray_cnt;
+  int gray_capacity;
+  Obj** gray_stack;
 } HVM;
 
 typedef enum {

@@ -3,6 +3,8 @@
 
 #include <stdlib.h>
 
+#include "object.h"
+
 #define ALLOCATE(type, count) \
     (type*)reallocate(NULL, 0, sizeof(type) * (count))
 
@@ -17,6 +19,10 @@ int GROW_CAPACITY(int capacity);
     reallocate(pointer, sizeof(type) * (old_size), 0)
 
 void* reallocate(void* pointer, size_t old_size, size_t new_size);
+
+void mark_object_memory(Obj *object);
+void mark_memory_slot(Value value);
+void take_out_garbage();
 
 void free_objects();
 

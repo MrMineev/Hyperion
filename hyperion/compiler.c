@@ -11,6 +11,7 @@
 #include "object.h"
 #include "compiler.h"
 #include "debug.h"
+#include "memory.h"
 
 #define UINT8_COUNT (UINT8_MAX + 1)
 
@@ -865,6 +866,14 @@ ObjFunction* compile(const char* source) {
 
   ObjFunction *function = end_compiler();
   return parser.had_error ? NULL : function;
+}
+
+void mark_compiler_roots() {
+  Compiler* compiler = current;
+  while (compiler != NULL) {
+    mark_object_memory((Obj*)compiler->function);
+    compiler = compiler->enclosing;
+  }
 }
 
 

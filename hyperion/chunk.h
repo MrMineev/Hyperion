@@ -6,7 +6,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "memory.h"
 #include "value.h"
 
 typedef enum {

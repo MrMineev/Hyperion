@@ -28,4 +28,7 @@ bool table_get(Table* table, ObjString* key, Value* value);
 void table_add_all(Table* from, Table* to);
 ObjString* table_find_string(Table* table, const char* chars, int size, uint32_t hash);
 
+void goodbye_white_table_friends(Table *table);
+void mark_table(Table *table);
+
 #endif

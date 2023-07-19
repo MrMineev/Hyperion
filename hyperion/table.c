@@ -120,3 +120,20 @@ ObjString* table_find_string(Table* table, const char* chars, int size, uint32_t
   }
 }
 
+void goodbye_white_table_friends(Table* table) {
+  for (int i = 0; i < table->capacity; i++) {
+    Entry* entry = &table->entries[i];
+    if (entry->key != NULL && !entry->key->obj.is_marked) {
+      table_delete(table, entry->key);
+    }
+  }
+}
+
+void mark_table(Table* table) {
+  for (int i = 0; i < table->capacity; i++) {
+    Entry* entry = &table->entries[i];
+    mark_object_memory((Obj*)entry->key);
+    mark_memory_slot(entry->value);
+  }
+}
+

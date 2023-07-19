@@ -15,4 +15,6 @@ To execute the bytecode you need to use the HVM (Hyperion Virtual Machine) will 
 
 - [ ] Being able to get value of variable by a string of it's name.
 
+- [ ] Improving Throughput vs Latency
+
 

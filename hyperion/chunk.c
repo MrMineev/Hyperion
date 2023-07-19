@@ -6,6 +6,7 @@
 #include "memory.h"
 #include "value.h"
 #include "chunk.h"
+#include "HVM.h"
 
 void create_chunk(Chunk *chunk) {
   chunk->size = 0;
@@ -28,7 +29,9 @@ void write_chunk(Chunk *chunk, uint8_t byte, int line) {
 }
 
 int add_constant(Chunk* chunk, Value value) {
+  push(value);
   write_value_array(&chunk->constants, value);
+  pop();
   return chunk->constants.size - 1;
 }
 

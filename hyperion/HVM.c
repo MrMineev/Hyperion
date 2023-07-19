@@ -4,6 +4,7 @@
 #include "debug.h"
 #include "compiler.h"
 #include "table.h"
+#include "memory.h"
 
 #include <time.h>
 #include <stdarg.h>
@@ -53,6 +54,14 @@ static void define_native(const char* name, NativeFn function) {
 void init_hvm() {
   init_stack();
   hvm.objects = NULL;
+
+  hvm.bytes_alloc = 0;
+  hvm.next_gc_limit = 1024 * 1024;
+
+  hvm.gray_cnt = 0;
+  hvm.gray_capacity = 0;
+  hvm.gray_stack = NULL;
+
   init_table(&hvm.globals);
   init_table(&hvm.strings);
 
@@ -157,8 +166,8 @@ static bool isFalsey(Value value) {
 }
 
 static void concatenate() {
-  ObjString* b = AS_STRING(pop());
-  ObjString* a = AS_STRING(pop());
+  ObjString* b = AS_STRING(peek_c(0));
+  ObjString* a = AS_STRING(peek_c(1));
 
   int size = a->size + b->size;
   char* chars = ALLOCATE(char, size + 1);
@@ -167,6 +176,8 @@ static void concatenate() {
   chars[size] = '\0';
 
   ObjString* result = take_string(chars, size);
+  pop();
+  pop();
   push(OBJ_VAL(result));
 }
 
