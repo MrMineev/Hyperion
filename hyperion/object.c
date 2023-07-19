@@ -18,12 +18,34 @@ static Obj* allocate_object(size_t size, ObjType type) {
   return object;
 }
 
+ObjClosure* create_closure(ObjFunction* function) {
+  ObjUpvalue** upvalues = ALLOCATE(ObjUpvalue*, function->upvalueCount);
+  for (int i = 0; i < function->upvalueCount; i++) {
+    upvalues[i] = NULL;
+  }
+
+  ObjClosure* closure = ALLOCATE_OBJ(ObjClosure, OBJ_CLOSURE);
+  closure->function = function;
+  closure->upvalues = upvalues;
+  closure->upvalueCount = function->upvalueCount;
+  return closure;
+}
+
 ObjFunction* create_function() {
   ObjFunction *obj_func = ALLOCATE_OBJ(ObjFunction, OBJ_FUNCTION);
   obj_func->arity = 0;
+  obj_func->upvalueCount = 0;
   obj_func->name = NULL;
   create_chunk(&obj_func->chunk);
   return obj_func;
+}
+
+ObjUpvalue* create_upvalue(Value* slot) {
+  ObjUpvalue* upvalue = ALLOCATE_OBJ(ObjUpvalue, OBJ_UPVALUE);
+  upvalue->closed = NIL_VAL;
+  upvalue->location = slot;
+  upvalue->next = NULL;
+  return upvalue;
 }
 
 ObjNative* create_native(NativeFn function) {
@@ -88,8 +110,14 @@ void print_object(Value value) {
     case OBJ_FUNCTION:
       print_function(AS_FUNCTION(value));
       break;
+    case OBJ_CLOSURE:
+      print_function(AS_CLOSURE(value)->function);
+      break;
     case OBJ_NATIVE:
       printf("<native fn>");
+      break;
+    case OBJ_UPVALUE:
+      printf("upvalue");
       break;
   }
 }

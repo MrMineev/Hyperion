@@ -17,6 +17,7 @@ static Value clock_native_function(int argCount, Value* args) {
 static void init_stack() {
   hvm.top = hvm.stack;
   hvm.frameCount = 0;
+  hvm.openUpvalues = NULL;
 }
 
 static void runtime_error(const char* format, ...) {
@@ -28,7 +29,7 @@ static void runtime_error(const char* format, ...) {
 
   for (int i = hvm.frameCount - 1; i >= 0; i--) {
     CallFrame* frame = &hvm.frames[i];
-    ObjFunction* function = frame->function;
+    ObjFunction* function = frame->closure->function;
     size_t instruction = frame->ip - function->chunk.code - 1;
     fprintf(stderr, "[line %d] in ", function->chunk.lines[instruction]);
     if (function->name == NULL) {
@@ -79,9 +80,9 @@ static Value peek_c(int distance) {
   return hvm.top[-1 - distance];
 }
 
-static bool call(ObjFunction* function, int argCount) {
-  if (argCount != function->arity) {
-    runtime_error("Expected %d arguments but got %d.", function->arity, argCount);
+static bool call(ObjClosure* closure, int argCount) {
+  if (argCount != closure->function->arity) {
+    runtime_error("Expected %d arguments but got %d.", closure->function->arity, argCount);
     return false;
   }
 
@@ -91,8 +92,8 @@ static bool call(ObjFunction* function, int argCount) {
   }
 
   CallFrame* frame = &hvm.frames[hvm.frameCount++];
-  frame->function = function;
-  frame->ip = function->chunk.code;
+  frame->closure = closure;
+  frame->ip = closure->function->chunk.code;
   frame->slots = hvm.top - argCount - 1;
   return true;
 }
@@ -100,8 +101,8 @@ static bool call(ObjFunction* function, int argCount) {
 static bool call_value(Value callee, int cnt) {
   if (IS_OBJ(callee)) {
     switch (OBJ_TYPE(callee)) {
-      case OBJ_FUNCTION: 
-        return call(AS_FUNCTION(callee), cnt);
+      case OBJ_CLOSURE:
+        return call(AS_CLOSURE(callee), cnt);
       case OBJ_NATIVE: {
         NativeFn native = AS_NATIVE(callee);
         Value result = native(cnt, hvm.top - cnt);
@@ -115,6 +116,40 @@ static bool call_value(Value callee, int cnt) {
   }
   runtime_error("Can only call functions and classes.");
   return false;
+}
+
+static ObjUpvalue* capture_upvalue(Value* local) {
+  ObjUpvalue* prevUpvalue = NULL;
+  ObjUpvalue* upvalue = hvm.openUpvalues;
+  while (upvalue != NULL && upvalue->location > local) {
+    prevUpvalue = upvalue;
+    upvalue = upvalue->next;
+  }
+
+  if (upvalue != NULL && upvalue->location == local) {
+    return upvalue;
+  }
+
+  ObjUpvalue* createdUpvalue = create_upvalue(local);
+  createdUpvalue->next = upvalue;
+
+  if (prevUpvalue == NULL) {
+    hvm.openUpvalues = createdUpvalue;
+  } else {
+    prevUpvalue->next = createdUpvalue;
+  }
+
+  return createdUpvalue;
+}
+
+static void close_upvalues(Value* last) {
+  while (hvm.openUpvalues != NULL &&
+         hvm.openUpvalues->location >= last) {
+    ObjUpvalue* upvalue = hvm.openUpvalues;
+    upvalue->closed = *upvalue->location;
+    upvalue->location = &upvalue->closed;
+    hvm.openUpvalues = upvalue->next;
+  }
 }
 
 static bool isFalsey(Value value) {
@@ -145,7 +180,7 @@ static InterReport execute() {
     (uint16_t)((frame->ip[-2] << 8) | frame->ip[-1]))
 
 #define READ_CONSTANT() \
-    (frame->function->chunk.constants.values[READ_BYTE()])
+    (frame->closure->function->chunk.constants.values[READ_BYTE()])
 
 #define READ_STRING() AS_STRING(READ_CONSTANT())
 #define BINARY_OP(valueType, op) \
@@ -171,8 +206,8 @@ static InterReport execute() {
     printf("\n");
     */
 
-    debug_instruction(&frame->function->chunk,
-        (int)(frame->ip - frame->function->chunk.code));
+    debug_instruction(&frame->closure->function->chunk,
+        (int)(frame->ip - frame->closure->function->chunk.code));
 
 #endif
 
@@ -181,6 +216,35 @@ static InterReport execute() {
       case OP_CONSTANT: {
         Value constant = READ_CONSTANT();
         push(constant);
+        break;
+      }
+      case OP_CLOSURE: {
+        ObjFunction* function = AS_FUNCTION(READ_CONSTANT());
+        ObjClosure* closure = create_closure(function);
+        push(OBJ_VAL(closure));
+        for (int i = 0; i < closure->upvalueCount; i++) {
+          uint8_t isLocal = READ_BYTE();
+          uint8_t index = READ_BYTE();
+          if (isLocal) {
+            closure->upvalues[i] = capture_upvalue(frame->slots + index);
+          } else {
+            closure->upvalues[i] = frame->closure->upvalues[index];
+          }
+        }
+        break;
+      }
+      case OP_CLOSE_UPVALUE:
+        close_upvalues(hvm.top - 1);
+        pop();
+        break;
+      case OP_GET_UPVALUE: {
+        uint8_t slot = READ_BYTE();
+        push(*frame->closure->upvalues[slot]->location);
+        break;
+      }
+      case OP_SET_UPVALUE: {
+        uint8_t slot = READ_BYTE();
+        *frame->closure->upvalues[slot]->location = peek_c(0);
         break;
       }
       case OP_PRINT: {
@@ -323,6 +387,7 @@ static InterReport execute() {
       }
       case OP_RETURN: {
         Value result = pop();
+        close_upvalues(frame->slots);
         hvm.frameCount--;
         if (hvm.frameCount == 0) {
           pop();
@@ -349,7 +414,11 @@ InterReport interpret(const char *source) {
   if (function == NULL) return INTER_COMPILE_ERROR;
 
   push(OBJ_VAL(function));
-  call(function, 0);
+
+  ObjClosure* closure = create_closure(function);
+  pop();
+  push(OBJ_VAL(closure));
+  call(closure, 0);
 
   return execute();
 }

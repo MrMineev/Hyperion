@@ -1,14 +1,18 @@
-fun fibo(n) {
-  if (n < 2) return n;
-  return fibo(n - 2) + fibo(n - 1);
+fun outer() {
+  let x = "value";
+  fun middle() {
+    fun inner() {
+      print x;
+    }
+
+    print "create inner closure";
+    return inner;
+  }
+
+  print "return from outer";
+  return middle;
 }
 
-let start = clock();
-for (let i = 0; i < 35; inc i) {
-  let random;
-  print random = fibo(i);
-}
-let end = clock();
-
-print end - start;
-
+let mid = outer();
+let in = mid();
+in();
