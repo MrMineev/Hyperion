@@ -1,12 +1,14 @@
-let MOD = 67;
-let sum = 0;
-for (let i = 1; i <= 1000; inc i) {
-  if ((i - 1) % MOD == 0) {
-    print i;
-  }
-  for (let j = 1; j <= 1000; inc j) {
-    sum = sum + (i * j) % MOD;
-  }
+fun fibo(n) {
+  if (n < 2) return n;
+  return fibo(n - 2) + fibo(n - 1);
 }
-print "== RESULT ==";
-print sum;
+
+let start = clock();
+for (let i = 0; i < 35; inc i) {
+  let random;
+  print random = fibo(i);
+}
+let end = clock();
+
+print end - start;
+

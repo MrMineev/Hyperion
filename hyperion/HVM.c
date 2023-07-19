@@ -5,9 +5,14 @@
 #include "compiler.h"
 #include "table.h"
 
+#include <time.h>
 #include <stdarg.h>
 
 HVM hvm;
+
+static Value clock_native_function(int argCount, Value* args) {
+  return NUMBER_VAL((double)clock() / CLOCKS_PER_SEC);
+}
 
 static void init_stack() {
   hvm.top = hvm.stack;
@@ -36,11 +41,21 @@ static void runtime_error(const char* format, ...) {
   init_stack();
 }
 
+static void define_native(const char* name, NativeFn function) {
+  push(OBJ_VAL(copy_string(name, (int)strlen(name))));
+  push(OBJ_VAL(create_native(function)));
+  set_table(&hvm.globals, AS_STRING(hvm.stack[0]), hvm.stack[1]);
+  pop();
+  pop();
+}
+
 void init_hvm() {
   init_stack();
   hvm.objects = NULL;
   init_table(&hvm.globals);
   init_table(&hvm.strings);
+
+  define_native("clock", clock_native_function);
 }
 
 void free_hvm() {
@@ -87,6 +102,13 @@ static bool call_value(Value callee, int cnt) {
     switch (OBJ_TYPE(callee)) {
       case OBJ_FUNCTION: 
         return call(AS_FUNCTION(callee), cnt);
+      case OBJ_NATIVE: {
+        NativeFn native = AS_NATIVE(callee);
+        Value result = native(cnt, hvm.top - cnt);
+        hvm.top -= cnt + 1;
+        push(result);
+        return true;
+      }
       default:
         break;
     }

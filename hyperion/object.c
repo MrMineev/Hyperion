@@ -26,6 +26,12 @@ ObjFunction* create_function() {
   return obj_func;
 }
 
+ObjNative* create_native(NativeFn function) {
+  ObjNative* native = ALLOCATE_OBJ(ObjNative, OBJ_NATIVE);
+  native->function = function;
+  return native;
+}
+
 static ObjString* allocate_string(char* chars, int size, uint32_t hash) {
   ObjString* string = ALLOCATE_OBJ(ObjString, OBJ_STRING);
   string->size = size;
@@ -81,6 +87,9 @@ void print_object(Value value) {
       break;
     case OBJ_FUNCTION:
       print_function(AS_FUNCTION(value));
+      break;
+    case OBJ_NATIVE:
+      printf("<native fn>");
       break;
   }
 }
