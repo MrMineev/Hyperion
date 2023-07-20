@@ -65,12 +65,17 @@ void init_hvm() {
   init_table(&hvm.globals);
   init_table(&hvm.strings);
 
+  hvm.initString = NULL;
+  hvm.initString = copy_string("init", 4);
+
   define_native("clock", clock_native_function);
 }
 
 void free_hvm() {
   free_table(&hvm.globals);
   free_table(&hvm.strings);
+
+  hvm.initString = NULL;
 
   free_objects();
 }
@@ -110,9 +115,21 @@ static bool call(ObjClosure* closure, int argCount) {
 static bool call_value(Value callee, int cnt) {
   if (IS_OBJ(callee)) {
     switch (OBJ_TYPE(callee)) {
+      case OBJ_BOUND_METHOD: {
+        ObjBoundMethod* bound = AS_BOUND_METHOD(callee);
+        hvm.top[-cnt - 1] = bound->receiver;
+        return call(bound->method, cnt);
+      }
       case OBJ_CLASS: {
         ObjClass* _class = AS_CLASS(callee);
         hvm.top[-cnt - 1] = OBJ_VAL(create_instance(_class));
+        Value initializer;
+        if (table_get(&_class->methods, hvm.initString, &initializer)) {
+          return call(AS_CLOSURE(initializer), cnt);
+        } else if (cnt != 0) {
+          runtime_error("Expected 0 arguments but got %d.", cnt);
+          return false;
+        }
         return true;
       }
       case OBJ_CLOSURE:
@@ -130,6 +147,47 @@ static bool call_value(Value callee, int cnt) {
   }
   runtime_error("Can only call functions and classes.");
   return false;
+}
+
+static bool invoke_from_class(ObjClass* _class, ObjString* name, int cnt) {
+  Value method;
+  if (!table_get(&_class->methods, name, &method)) {
+    runtime_error("Undefined property '%s'.", name->chars);
+    return false;
+  }
+  return call(AS_CLOSURE(method), cnt);
+}
+
+static bool invoke(ObjString* name, int cnt) {
+  Value receiver = peek_c(cnt);
+
+  if (!IS_INSTANCE(receiver)) {
+    runtime_error("Only instances have methods.");
+    return false;
+  }
+
+  ObjInstance* instance = AS_INSTANCE(receiver);
+
+  Value value;
+  if (table_get(&instance->fields, name, &value)) {
+    hvm.top[-cnt - 1] = value;
+    return call_value(value, cnt);
+  }
+
+  return invoke_from_class(instance->_class, name, cnt);
+}
+
+static bool bind_method(ObjClass* _class, ObjString* name) {
+  Value method;
+  if (!table_get(&_class->methods, name, &method)) {
+    runtime_error("Undefined property '%s'.", name->chars);
+    return false;
+  }
+
+  ObjBoundMethod* bound = create_bound_method(peek_c(0), AS_CLOSURE(method));
+  pop();
+  push(OBJ_VAL(bound));
+  return true;
 }
 
 static ObjUpvalue* capture_upvalue(Value* local) {
@@ -164,6 +222,13 @@ static void close_upvalues(Value* last) {
     upvalue->location = &upvalue->closed;
     hvm.openUpvalues = upvalue->next;
   }
+}
+
+static void define_method(ObjString* name) {
+  Value method = peek_c(0);
+  ObjClass* _class = AS_CLASS(peek_c(1));
+  set_table(&_class->methods, name, method);
+  pop();
 }
 
 static bool isFalsey(Value value) {
@@ -229,6 +294,18 @@ static InterReport execute() {
 
     uint8_t instruction;
     switch (instruction = READ_BYTE()) {
+      case OP_INVOKE: {
+        ObjString* method = READ_STRING();
+        int cnt = READ_BYTE();
+        if (!invoke(method, cnt)) {
+          return INTER_RUNTIME_ERROR;
+        }
+        frame = &hvm.frames[hvm.frameCount - 1];
+        break;
+      }
+      case OP_METHOD:
+        define_method(READ_STRING());
+        break;
       case OP_GET_PROPERTY: {
         if (!IS_INSTANCE(peek_c(0))) {
           runtime_error("Only instances have properties.");
@@ -245,8 +322,10 @@ static InterReport execute() {
           break;
         }
 
-        runtime_error("Undefined property '%s'.", name->chars);
-        return INTER_RUNTIME_ERROR;
+        if (!bind_method(instance->_class, name)) {
+          return INTER_RUNTIME_ERROR;
+        }
+        break;
       }
       case OP_SET_PROPERTY: {
         if (!IS_INSTANCE(peek_c(1))) {

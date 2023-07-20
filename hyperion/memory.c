@@ -82,6 +82,12 @@ static void visit_object(Obj* object) {
 #endif
 
   switch (object->type) {
+    case OBJ_BOUND_METHOD: {
+      ObjBoundMethod* bound = (ObjBoundMethod*)object;
+      mark_memory_slot(bound->receiver);
+      mark_object_memory((Obj*)bound->method);
+      break;
+    }
     case OBJ_INSTANCE: {
       ObjInstance* instance = (ObjInstance*)object;
       mark_object_memory((Obj*)instance->_class);
@@ -91,6 +97,7 @@ static void visit_object(Obj* object) {
     case OBJ_CLASS: {
       ObjClass *_class = (ObjClass*)object;
       mark_object_memory((Obj*)_class->name);
+      mark_table(&_class->methods);
       break;
     }
     case OBJ_CLOSURE: {
@@ -122,6 +129,9 @@ static void free_object(Obj* object) {
 #endif
 
   switch (object->type) {
+    case OBJ_BOUND_METHOD:
+      FREE(ObjBoundMethod, object);
+      break;
     case OBJ_INSTANCE: {
       ObjInstance* instance = (ObjInstance*)object;
       free_table(&instance->fields);
@@ -129,6 +139,8 @@ static void free_object(Obj* object) {
       break;
     }
     case OBJ_CLASS: {
+      ObjClass* _class = (ObjClass*)object;
+      free_table(&_class->methods);
       FREE(ObjClass, object);
       break;
     }
@@ -198,6 +210,8 @@ static void mark_roots() {
   mark_table(&hvm.globals);
 
   mark_compiler_roots();
+
+  mark_object_memory((Obj*)hvm.initString);
 }
 
 static void visit_nodes() {

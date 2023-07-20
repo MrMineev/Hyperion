@@ -36,6 +36,8 @@ typedef struct {
   Table globals;
   Table strings;
 
+  ObjString* initString;
+
   int gray_cnt;
   int gray_capacity;
   Obj** gray_stack;

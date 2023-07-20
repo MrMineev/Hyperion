@@ -1,6 +1,16 @@
-class Pair {}
+class Person {
+  init(name, age) {
+    this.name = name;
+    this.age = age;
+  }
 
-let pair = Pair();
-pair.first = 1;
-pair.second = 2;
-print pair.first + pair.second;
+  show() {
+    print "[NAME]: " + this.name + " [AGE]: " + this.age;
+  }
+}
+
+let Daniel = Person(
+  "Daniel",
+  "14"
+);
+Daniel.show();

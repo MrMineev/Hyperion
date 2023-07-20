@@ -20,6 +20,15 @@ int constant_instruction(const char* op_command, Chunk *chunk, int offset) {
   return offset + 2;
 }
 
+static int invoke_instruction(const char* name, Chunk* chunk, int offset) {
+  uint8_t constant = chunk->code[offset + 1];
+  uint8_t cnt = chunk->code[offset + 2];
+  // printf("%-16s (%d args) %4d '", name, cnt, constant);
+  // print_value(chunk->constants.values[constant]);
+  // printf("'\n");
+  return offset + 3;
+}
+
 static int byte_instruction(const char* name, Chunk* chunk, int offset) {
   uint8_t slot = chunk->code[offset + 1];
   // printf("%-16s %4d\n", name, slot);
@@ -46,6 +55,10 @@ int debug_instruction(Chunk *chunk, int offset) {
 
   uint8_t instruction = chunk->code[offset];
   switch (instruction) {
+    case OP_INVOKE:
+      return invoke_instruction("OP_INVOKE", chunk, offset);
+    case OP_METHOD:
+      return constant_instruction("OP_METHOD", chunk, offset);
     case OP_GET_PROPERTY:
       return constant_instruction("OP_GET_PROPERTY", chunk, offset);
     case OP_SET_PROPERTY:
@@ -113,9 +126,9 @@ int debug_instruction(Chunk *chunk, int offset) {
     case OP_CLOSURE: {
       offset++;
       uint8_t constant = chunk->code[offset++];
-      printf("%-16s %4d ", "OP_CLOSURE", constant);
-      print_value(chunk->constants.values[constant]);
-      printf("\n");
+      // printf("%-16s %4d ", "OP_CLOSURE", constant);
+      // print_value(chunk->constants.values[constant]);
+      // printf("\n");
 
       ObjFunction* function = AS_FUNCTION(chunk->constants.values[constant]);
       for (int j = 0; j < function->upvalueCount; j++) {
