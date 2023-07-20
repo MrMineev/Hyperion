@@ -1,16 +1,49 @@
-class Person {
-  init(name, age) {
-    this.name = name;
-    this.age = age;
-  }
-
-  show() {
-    print "[NAME]: " + this.name + " [AGE]: " + this.age;
+fun mid_l_r(l, r) {
+  let sum = l + r;
+  if (sum % 2 == 0) {
+    return sum / 2;
+  } else {
+    return sum / 2 - 0.5;
   }
 }
 
-let Daniel = Person(
-  "Daniel",
-  "14"
-);
-Daniel.show();
+fun abs(n) {
+  if (n < 0) { return -n; }
+  return n;
+}
+
+let EPS = 0.01;
+let time = 0;
+
+let l = 0;
+let r = 4000000;
+
+while (abs(time - EPS) != 1) {
+  print "== STEP ==";
+  print l;
+  print r;
+
+  let mid = mid_l_r(l, r);
+
+  let start = clock();
+  let random = 0;
+  for (let i = 0; i < mid; inc i) {
+    inc random;
+  }
+  let end = clock();
+
+  time = end - start;
+
+  print "-- TIME --";
+  print time;
+
+  if (time > 1) {
+    r = mid;
+  } else {
+    l = mid;
+  }
+}
+
+print "== RESULT ==";
+print l;
+
