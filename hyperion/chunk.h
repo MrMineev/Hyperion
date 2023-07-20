@@ -9,6 +9,9 @@
 #include "value.h"
 
 typedef enum {
+  OP_GET_PROPERTY,
+  OP_SET_PROPERTY,
+  OP_CLASS,
   OP_CLOSURE,
   OP_PRINT,
   OP_JUMP_IF_FALSE,

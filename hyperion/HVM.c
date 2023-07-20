@@ -110,6 +110,11 @@ static bool call(ObjClosure* closure, int argCount) {
 static bool call_value(Value callee, int cnt) {
   if (IS_OBJ(callee)) {
     switch (OBJ_TYPE(callee)) {
+      case OBJ_CLASS: {
+        ObjClass* _class = AS_CLASS(callee);
+        hvm.top[-cnt - 1] = OBJ_VAL(create_instance(_class));
+        return true;
+      }
       case OBJ_CLOSURE:
         return call(AS_CLOSURE(callee), cnt);
       case OBJ_NATIVE: {
@@ -224,11 +229,46 @@ static InterReport execute() {
 
     uint8_t instruction;
     switch (instruction = READ_BYTE()) {
+      case OP_GET_PROPERTY: {
+        if (!IS_INSTANCE(peek_c(0))) {
+          runtime_error("Only instances have properties.");
+          return INTER_RUNTIME_ERROR;
+        }
+
+        ObjInstance* instance = AS_INSTANCE(peek_c(0));
+        ObjString* name = READ_STRING();
+
+        Value value;
+        if (table_get(&instance->fields, name, &value)) {
+          pop();
+          push(value);
+          break;
+        }
+
+        runtime_error("Undefined property '%s'.", name->chars);
+        return INTER_RUNTIME_ERROR;
+      }
+      case OP_SET_PROPERTY: {
+        if (!IS_INSTANCE(peek_c(1))) {
+          runtime_error("Only instances have fields.");
+          return INTER_RUNTIME_ERROR;
+        }
+
+        ObjInstance* instance = AS_INSTANCE(peek_c(1));
+        set_table(&instance->fields, READ_STRING(), peek_c(0));
+        Value value = pop();
+        pop();
+        push(value);
+        break;
+      }
       case OP_CONSTANT: {
         Value constant = READ_CONSTANT();
         push(constant);
         break;
       }
+      case OP_CLASS:
+        push(OBJ_VAL(create_class(READ_STRING())));
+        break;
       case OP_CLOSURE: {
         ObjFunction* function = AS_FUNCTION(READ_CONSTANT());
         ObjClosure* closure = create_closure(function);
