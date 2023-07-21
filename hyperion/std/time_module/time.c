@@ -18,7 +18,7 @@ void time_module_init() {
       &hvm.globals,
       AS_STRING(
         OBJ_VAL(
-          copy_string("time:clock", (int)strlen("clock"))
+          copy_string("time:clock", (int)strlen("time:clock"))
         )
       ),
       OBJ_VAL(
