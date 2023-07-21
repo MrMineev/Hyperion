@@ -8,6 +8,15 @@
 #include "../../HVM.h"
 #include "../../value.h"
 
+static Value abs_native_function(int argCount, Value* args) {
+  double c = AS_NUMBER(args[0]);
+  if (c < 0) {
+    return NUMBER_VAL(-c);
+  } else {
+    return NUMBER_VAL(c);
+  }
+}
+
 static Value fac_native_function(int argCount, Value* args) {
   int r = 1;
   for (int i = 1; i <= (int)AS_NUMBER(args[0]); i++) {
@@ -26,7 +35,7 @@ static Value floor_native_function(int argCount, Value* args) {
   return NUMBER_VAL((double)r);
 }
 
-void add_module(const char* name, Value (*f)(int, Value*)) {
+void add_module_math(const char* name, Value (*f)(int, Value*)) {
   set_table(
       &hvm.globals,
       AS_STRING(
@@ -41,8 +50,9 @@ void add_module(const char* name, Value (*f)(int, Value*)) {
 }
 
 void math_module_init() {
-  add_module("math:fac", fac_native_function);
-  add_module("math:ceil", ceil_native_function);
-  add_module("math:floor", floor_native_function);
+  add_module_math("math:fac", fac_native_function);
+  add_module_math("math:ceil", ceil_native_function);
+  add_module_math("math:floor", floor_native_function);
+  add_module_math("math:abs", abs_native_function);
 }
 

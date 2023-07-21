@@ -14,7 +14,8 @@
   ],
   "modules": [
     "hyperion/std/time_module/time.c",
-    "hyperion/std/math_module/math.c"
+    "hyperion/std/math_module/math.c",
+    "hyperion/std/type_conversion_module/type_conversion.c"
   ],
   "output": "hypl"
 }
