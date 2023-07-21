@@ -10,6 +10,7 @@
 #include "std/time_module/time.h"
 #include "std/math_module/math.h"
 #include "std/type_conversion_module/type_conversion.h"
+#include "std/file_io_module/file_io.h"
 // MODULES -->
 
 #include <stdarg.h>
@@ -435,6 +436,8 @@ static InterReport execute() {
           math_module_init();
         } else if (strcmp(name->chars, "type_conv") == 0) {
           type_conversion_module_init();
+        } else if (strcmp(name->chars, "file_io") == 0) {
+          file_io_module_init();
         } else {
           runtime_error("No Standard Module called '%s'", name->chars);
         }
