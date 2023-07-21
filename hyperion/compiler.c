@@ -905,19 +905,25 @@ static void inc_stmt() {
   } else {
     error("Expect variable name.");
   }
+}
 
-  /*
-  uint8_t global = parse_variable("Expect variable name.");
+static void import_stmt() {
+  if (match(TOKEN_STD)) {
+    // standart library in folder hyperion/std
+    consume(TOKEN_IDENTIFIER, "Expect library name after 'import'");
+    uint8_t library_name = identifier_constant(&parser.previous);
+    emit_bytes(OP_IMPORT, library_name);
 
-  emit_bytes(OP_GET_GLOBAL, global);
-  emit_bytes(OP_CONSTANT, create_constant(NUMBER_VAL(1)));
-  emit_byte(OP_ADD);
-  emit_bytes(OP_SET_GLOBAL, global);
-  */
+    consume(TOKEN_SEMICOLON, "Expect ';' after import statement.");
+  } else {
+    // user's module
+  }
 }
 
 static void statement() {
-  if (match(TOKEN_PRINT)) {
+  if (match(TOKEN_IMPORT)) {
+    import_stmt();
+  } else if (match(TOKEN_PRINT)) {
     print_stmt();
   } else if (match(TOKEN_FOR)) {
     for_statement();

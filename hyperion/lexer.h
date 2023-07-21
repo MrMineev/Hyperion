@@ -8,6 +8,9 @@
 #include <string.h>
 
 typedef enum {
+  // Modules & Import
+  TOKEN_IMPORT, TOKEN_STD,
+
   // Single-character tokens.
   TOKEN_LEFT_PAREN, TOKEN_RIGHT_PAREN,
   TOKEN_LEFT_BRACE, TOKEN_RIGHT_BRACE,

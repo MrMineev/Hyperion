@@ -6,14 +6,14 @@
 #include "table.h"
 #include "memory.h"
 
-#include <time.h>
+// <-- MODULES
+#include "std/time_module/time_module.h"
+// MODULES -->
+
 #include <stdarg.h>
+#include <string.h>
 
 HVM hvm;
-
-static Value clock_native_function(int argCount, Value* args) {
-  return NUMBER_VAL((double)clock() / CLOCKS_PER_SEC);
-}
 
 static void init_stack() {
   hvm.top = hvm.stack;
@@ -68,7 +68,7 @@ void init_hvm() {
   hvm.initString = NULL;
   hvm.initString = copy_string("init", 4);
 
-  define_native("clock", clock_native_function);
+  // define_native("clock", clock_native_function);
 }
 
 void free_hvm() {
@@ -277,7 +277,6 @@ static InterReport execute() {
 
   while (true) {
 #ifdef DEBUG_TRACE_EXECUTION
-    /*
     printf("\t");
     for (Value* pancake = hvm.stack; pancake < hvm.top; pancake++) {
       printf("[ ");
@@ -285,7 +284,6 @@ static InterReport execute() {
       printf(" ]");
     }
     printf("\n");
-    */
 
     debug_instruction(&frame->closure->function->chunk,
         (int)(frame->ip - frame->closure->function->chunk.code));
@@ -423,6 +421,26 @@ static InterReport execute() {
         ObjString* name = READ_STRING();
         set_table(&hvm.globals, name, peek_c(0));
         pop();
+        break;
+      }
+      case OP_IMPORT: {
+        ObjString *name = READ_STRING();
+        if (strcmp(name->chars, "time") == 0) {
+          time_module_init();
+          /*
+          set_table(
+              &hvm.globals,
+              AS_STRING(
+                OBJ_VAL(
+                  copy_string("clock", (int)strlen("clock"))
+                )
+              ),
+              OBJ_VAL(
+                create_native(clock_native_function)
+              )
+          );
+          */
+        }
         break;
       }
       case OP_GET_GLOBAL: {
