@@ -440,6 +440,7 @@ static InterReport execute() {
           file_io_module_init();
         } else {
           runtime_error("No Standard Module called '%s'", name->chars);
+          return INTER_RUNTIME_ERROR;
         }
         break;
       }
