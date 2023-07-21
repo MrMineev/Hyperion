@@ -1,49 +1,38 @@
-fun mid_l_r(l, r) {
-  let sum = l + r;
-  if (sum % 2 == 0) {
-    return sum / 2;
-  } else {
-    return sum / 2 - 0.5;
-  }
-}
-
-fun abs(n) {
-  if (n < 0) { return -n; }
-  return n;
-}
+import std math;
+import std time;
+import std type_conv;
 
 let EPS = 0.01;
-let time = 0;
 
 let l = 0;
-let r = 4000000;
+let r = 10000000;
 
-while (abs(time - EPS) != 1) {
+let ttime = 0;
+
+while (math:abs(ttime - 1) > EPS) {
   print "== STEP ==";
-  print l;
-  print r;
+  print "L = " + type_conv:to_string(l);
+  print "R = " + type_conv:to_string(r);
 
-  let mid = mid_l_r(l, r);
+  let mid = math:floor((l + r) / 2);
 
-  let start = clock();
+  let start = time:clock();
+
   let random = 0;
   for (let i = 0; i < mid; inc i) {
     inc random;
   }
-  let end = clock();
 
-  time = end - start;
+  let end = time:clock();
 
-  print "-- TIME --";
-  print time;
+  ttime = end - start;
 
-  if (time > 1) {
+  print "TIME = " + type_conv:to_string(ttime);
+  
+  if (ttime > 1) {
     r = mid;
   } else {
     l = mid;
   }
 }
-
-print "== RESULT ==";
-print l;
 
