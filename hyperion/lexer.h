@@ -9,7 +9,7 @@
 
 typedef enum {
   // Modules & Import
-  TOKEN_IMPORT, TOKEN_STD,
+  TOKEN_IMPORT, TOKEN_STD, TOKEN_MODULE,
 
   // Single-character tokens.
   TOKEN_LEFT_PAREN, TOKEN_RIGHT_PAREN,

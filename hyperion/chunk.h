@@ -9,7 +9,9 @@
 #include "value.h"
 
 typedef enum {
-  OP_IMPORT,
+  OP_POP,
+  OP_IMPORT_STD,
+  OP_IMPORT_MODULE,
   OP_INVOKE,
   OP_METHOD,
   OP_GET_PROPERTY,
@@ -21,7 +23,6 @@ typedef enum {
   OP_LOOP,
   OP_JUMP,
   OP_CALL,
-  OP_POP,
   OP_DEFINE_GLOBAL,
   OP_GET_GLOBAL,
   OP_SET_GLOBAL,

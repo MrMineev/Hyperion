@@ -55,8 +55,10 @@ int debug_instruction(Chunk *chunk, int offset) {
 
   uint8_t instruction = chunk->code[offset];
   switch (instruction) {
-    case OP_IMPORT:
-      return constant_instruction("OP_IMPORT", chunk, offset);
+    case OP_IMPORT_STD:
+      return constant_instruction("OP_IMPORT_STD", chunk, offset);
+    case OP_IMPORT_MODULE:
+      return constant_instruction("OP_IMPORT_MODULE", chunk, offset);
     case OP_INVOKE:
       return invoke_instruction("OP_INVOKE", chunk, offset);
     case OP_METHOD:

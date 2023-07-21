@@ -912,11 +912,18 @@ static void import_stmt() {
     // standart library in folder hyperion/std
     consume(TOKEN_IDENTIFIER, "Expect library name after 'import'");
     uint8_t library_name = identifier_constant(&parser.previous);
-    emit_bytes(OP_IMPORT, library_name);
+    emit_bytes(OP_IMPORT_STD, library_name);
 
     consume(TOKEN_SEMICOLON, "Expect ';' after import statement.");
-  } else {
+  } else if (match(TOKEN_MODULE)) {
     // user's module
+    consume(TOKEN_IDENTIFIER, "Expect library name after 'import'");
+    uint8_t library_name = identifier_constant(&parser.previous);
+    emit_bytes(OP_IMPORT_MODULE, library_name);
+
+    emit_byte(OP_POP); // To delete the return
+
+    consume(TOKEN_SEMICOLON, "Expect ';' after import statement.");
   }
 }
 

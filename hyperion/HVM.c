@@ -15,6 +15,34 @@
 
 #include <stdarg.h>
 #include <string.h>
+#include <stdlib.h>
+
+char* read_file(char* file_path) {
+    FILE* file = fopen(file_path, "r");
+    if (file == NULL) {
+      fprintf(stderr, "Error opening file: %s\n", file_path);
+      return NULL;
+    }
+    fseek(file, 0, SEEK_END);
+    long file_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    char* content = (char*)malloc(file_size + 1);
+    if (content == NULL) {
+      fclose(file);
+      fprintf(stderr, "Memory allocation failed.\n");
+      return NULL;
+    }
+    size_t bytes_read = fread(content, 1, file_size, file);
+    if (bytes_read != file_size) {
+      fclose(file);
+      free(content);
+      fprintf(stderr, "Error reading file: %s\n", file_path);
+      return NULL;
+    }
+    content[file_size] = '\0';
+    fclose(file);
+    return content;
+}
 
 HVM hvm;
 
@@ -428,7 +456,21 @@ static InterReport execute() {
         pop();
         break;
       }
-      case OP_IMPORT: {
+      case OP_IMPORT_MODULE: {
+        ObjString *name = READ_STRING();
+
+        char* module_name = name->chars;
+        char* extension = (char*)".hypl";
+
+        char* module = (char*)malloc(strlen(module_name) + strlen(extension) + 1);
+        strcat(module, module_name);
+        strcat(module, extension);
+
+        char* source_content = read_file(module);
+
+        return interpret(source_content);
+      }
+      case OP_IMPORT_STD: {
         ObjString *name = READ_STRING();
         if (strcmp(name->chars, "time") == 0) {
           time_module_init();
@@ -569,7 +611,9 @@ InterReport interpret(const char *source) {
   push(OBJ_VAL(closure));
   call(closure, 0);
 
-  return execute();
+  InterReport res = execute();
+
+  return res;
 }
 
 
