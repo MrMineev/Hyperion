@@ -118,14 +118,18 @@ static TokenType identifierType() {
         switch (lexer.start[1]) {
           case 'a': return search_keyword(2, 3, "lse", TOKEN_FALSE);
           case 'o': return search_keyword(2, 1, "r", TOKEN_FOR);
-          case 'u': return search_keyword(2, 1, "n", TOKEN_FUN);
         }
       }
       break;
     case 'd':
       if (lexer.current - lexer.start > 1) {
         switch (lexer.start[1]) {
-          case 'e': return search_keyword(2, 2, "cr", TOKEN_DECR);
+          case 'e':
+            if (lexer.current - lexer.start > 2 &&
+                lexer.start[2] == 'c') {
+              return search_keyword(2, 2, "cr", TOKEN_DECR);
+            }
+            return search_keyword(2, 1, "f", TOKEN_FUN);
         }
       }
     case 'i':

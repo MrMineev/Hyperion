@@ -2,12 +2,29 @@
 
 # 🌓 Hyperion
 
-The goal is to build a compiler called Hyperion that would compile to bytecode.
-To execute the bytecode you need to use the HVM (Hyperion Virtual Machine) will implement a JIT inside of it.
+Hyperion is a simple programming language. To import standart libraries write:
 
-## Step by Step
+'import std <name>'
 
-1. For the start i won't be saving the bytecode anywhere i will just be executing it directly using the HVM (Hyperion Virtual Machine) without any JIT. Then after i build a good language i will build the separate HVM with a JIT.
+There are for, while loops:
+
+while (condition) {}
+
+for (let i = 0; i < n; inc i) {}
+
+In Hyperion there are the keywords inc and decr. inc adds one to a variable and decr subtracts one from a variable.
+
+To declare a function use the def keyword:
+
+def f(n) {
+  return n + 1;
+}
+
+There are also if statements
+
+if (condition) {
+} else {
+}
 
 ## TODO
 
@@ -16,5 +33,7 @@ To execute the bytecode you need to use the HVM (Hyperion Virtual Machine) will 
 - [ ] Being able to get value of variable by a string of it's name.
 
 - [ ] Improving Throughput vs Latency
+
+- [ ] Implement Lists and Arrays
 
 

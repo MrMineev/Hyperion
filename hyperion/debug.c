@@ -128,18 +128,18 @@ int debug_instruction(Chunk *chunk, int offset) {
     case OP_CLOSURE: {
       offset++;
       uint8_t constant = chunk->code[offset++];
-      printf("%-16s %4d ", "OP_CLOSURE", constant);
-      print_value(chunk->constants.values[constant]);
-      printf("\n");
+      // printf("%-16s %4d ", "OP_CLOSURE", constant);
+      // print_value(chunk->constants.values[constant]);
+      // printf("\n");
 
       ObjFunction* function = AS_FUNCTION(chunk->constants.values[constant]);
       for (int j = 0; j < function->upvalueCount; j++) {
         int isLocal = chunk->code[offset++];
         int index = chunk->code[offset++];
-        printf(
-            "%04d      |                     %s %d\n",
-            offset - 2, isLocal ? "local" : "upvalue", index
-        );
+        // printf(
+            // "%04d      |                     %s %d\n",
+            // offset - 2, isLocal ? "local" : "upvalue", index
+        // );
       }
       return offset;
     }
