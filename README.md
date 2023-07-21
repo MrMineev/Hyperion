@@ -5,7 +5,13 @@
 Hyperion is a simple programming language. To import standart libraries write:
 
 ```
-import std <name>
+import std <name>;
+```
+
+To import stuff from other files write:
+
+```
+import module <name>;
 ```
 
 There are for, while loops:
