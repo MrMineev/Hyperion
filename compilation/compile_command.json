@@ -13,7 +13,8 @@
     "hyperion/table.c"
   ],
   "modules": [
-    "hyperion/std/time_module/time_module.c"
+    "hyperion/std/time_module/time.c",
+    "hyperion/std/math_module/math.c"
   ],
   "output": "hypl"
 }

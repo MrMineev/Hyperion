@@ -5,7 +5,7 @@
 
 #include <time.h>
 
-#include "time_module.h"
+#include "time.h"
 #include "../../HVM.h"
 #include "../../value.h"
 
@@ -18,7 +18,7 @@ void time_module_init() {
       &hvm.globals,
       AS_STRING(
         OBJ_VAL(
-          copy_string("clock", (int)strlen("clock"))
+          copy_string("time:clock", (int)strlen("clock"))
         )
       ),
       OBJ_VAL(

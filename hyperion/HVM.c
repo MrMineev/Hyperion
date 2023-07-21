@@ -7,7 +7,8 @@
 #include "memory.h"
 
 // <-- MODULES
-#include "std/time_module/time_module.h"
+#include "std/time_module/time.h"
+#include "std/math_module/math.h"
 // MODULES -->
 
 #include <stdarg.h>
@@ -277,6 +278,7 @@ static InterReport execute() {
 
   while (true) {
 #ifdef DEBUG_TRACE_EXECUTION
+    /*
     printf("\t");
     for (Value* pancake = hvm.stack; pancake < hvm.top; pancake++) {
       printf("[ ");
@@ -284,6 +286,7 @@ static InterReport execute() {
       printf(" ]");
     }
     printf("\n");
+    */
 
     debug_instruction(&frame->closure->function->chunk,
         (int)(frame->ip - frame->closure->function->chunk.code));
@@ -427,19 +430,10 @@ static InterReport execute() {
         ObjString *name = READ_STRING();
         if (strcmp(name->chars, "time") == 0) {
           time_module_init();
-          /*
-          set_table(
-              &hvm.globals,
-              AS_STRING(
-                OBJ_VAL(
-                  copy_string("clock", (int)strlen("clock"))
-                )
-              ),
-              OBJ_VAL(
-                create_native(clock_native_function)
-              )
-          );
-          */
+        } else if (strcmp(name->chars, "math") == 0) {
+          math_module_init();
+        } else {
+          runtime_error("No Standard Module called '%s'", name->chars);
         }
         break;
       }
