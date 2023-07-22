@@ -11,6 +11,7 @@
 #include "std/math_module/math.h"
 #include "std/type_conversion_module/type_conversion.h"
 #include "std/file_io_module/file_io.h"
+#include "std/console_module/console.h"
 // MODULES -->
 
 #include <stdarg.h>
@@ -480,6 +481,8 @@ static InterReport execute() {
           type_conversion_module_init();
         } else if (strcmp(name->chars, "file_io") == 0) {
           file_io_module_init();
+        } else if (strcmp(name->chars, "console") == 0) {
+          console_module_init();
         } else {
           runtime_error("No Standard Module called '%s'", name->chars);
           return INTER_RUNTIME_ERROR;

@@ -16,7 +16,8 @@
     "hyperion/std/time_module/time.c",
     "hyperion/std/math_module/math.c",
     "hyperion/std/type_conversion_module/type_conversion.c",
-    "hyperion/std/file_io_module/file_io.c"
+    "hyperion/std/file_io_module/file_io.c",
+    "hyperion/std/console_module/console.c"
   ],
   "output": "hypl"
 }
