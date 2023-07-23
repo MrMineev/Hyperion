@@ -8,6 +8,23 @@
 #include "../../HVM.h"
 #include "../../value.h"
 
+static Value pi_native_function(int argCount, Value *args) {
+  double PI = 3.14159265;
+  return NUMBER_VAL(PI);
+}
+
+static Value cos_native_function(int argCount, Value *args) {
+    double angle_radians = AS_NUMBER(args[0]);
+    double result = cos(angle_radians);
+    return NUMBER_VAL(result);
+}
+
+static Value sin_native_function(int argCount, Value *args) {
+    double angle_radians = AS_NUMBER(args[0]);
+    double result = sin(angle_radians);
+    return NUMBER_VAL(result);
+}
+
 static Value abs_native_function(int argCount, Value* args) {
   double c = AS_NUMBER(args[0]);
   if (c < 0) {
@@ -54,5 +71,8 @@ void math_module_init() {
   add_module_math("math:ceil", ceil_native_function);
   add_module_math("math:floor", floor_native_function);
   add_module_math("math:abs", abs_native_function);
+  add_module_math("math:sin", sin_native_function);
+  add_module_math("math:cos", cos_native_function);
+  add_module_math("math:pi", pi_native_function);
 }
 
