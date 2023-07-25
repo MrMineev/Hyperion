@@ -824,6 +824,11 @@ static void if_statement() {
 
 static void print_stmt() {
   expression();
+  if (match(TOKEN_LINE)) {
+    consume(TOKEN_SEMICOLON, "Expect ';' after value");
+    emit_byte(OP_PRINT_TOLINE);
+    return;
+  }
   consume(TOKEN_SEMICOLON, "Expect ';' after value");
   emit_byte(OP_PRINT);
 }

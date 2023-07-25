@@ -471,6 +471,10 @@ static InterReport execute() {
         *frame->closure->upvalues[slot]->location = peek_c(0);
         break;
       }
+      case OP_PRINT_TOLINE: {
+        print_value(pop());
+        break;
+      }
       case OP_PRINT: {
         print_value(pop());
         printf("\n");

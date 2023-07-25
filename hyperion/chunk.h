@@ -22,6 +22,7 @@ typedef enum {
   OP_CLASS,
   OP_CLOSURE,
   OP_PRINT,
+  OP_PRINT_TOLINE,
   OP_JUMP_IF_FALSE,
   OP_LOOP,
   OP_JUMP,
