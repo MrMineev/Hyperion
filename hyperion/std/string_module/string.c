@@ -31,14 +31,27 @@ char* char_to_string(char c) {
 }
 
 static Value chr_native_function(int argCount, Value *args) {
+  return make_string_string(
+      char_to_string((char)AS_NUMBER(args[0]))
+  );
+}
+
+static Value ord_native_function(int argCount, Value *args) {
   return NUMBER_VAL(
     (int)AS_STRING(args[0])->chars[0]
   );
 }
 
-static Value ord_native_function(int argCount, Value *args) {
+static Value get_native_function(int argCount, Value *args) {
+  int index = ceil(
+    AS_NUMBER(
+      args[1]
+    )
+  );
   return make_string_string(
-      char_to_string((char)AS_NUMBER(args[0]))
+    char_to_string(
+      AS_STRING(args[0])->chars[index]
+    )
   );
 }
 
@@ -66,5 +79,6 @@ void string_module_init() {
   add_module_string("string:len", string_len_native_function);
   add_module_string("string:ord", ord_native_function);
   add_module_string("string:chr", chr_native_function);
+  add_module_string("string:get", get_native_function);
 }
 
