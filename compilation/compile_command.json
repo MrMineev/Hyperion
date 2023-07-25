@@ -20,7 +20,8 @@
     "hyperion/std/file_io_module/file_io.c",
     "hyperion/std/console_module/console.c",
     "hyperion/std/list_module/list.c",
-    "hyperion/std/sys_module/sys.c"
+    "hyperion/std/sys_module/sys.c",
+    "hyperion/std/os_module/os.c"
   ],
   "output": "hypl"
 }

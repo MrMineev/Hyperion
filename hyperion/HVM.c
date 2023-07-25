@@ -14,6 +14,7 @@
 #include "std/console_module/console.h"
 #include "std/list_module/list.h"
 #include "std/sys_module/sys.h"
+#include "std/os_module/os.h"
 // MODULES -->
 
 #include <stdarg.h>
@@ -547,6 +548,8 @@ static InterReport execute() {
           list_module_init();
         } else if (strcmp(name->chars, "sys") == 0) {
           sys_module_init();
+        } else if (strcmp(name->chars, "os") == 0) {
+          os_module_init();
         } else {
           runtime_error("No Standard Module called '%s'", name->chars);
           return INTER_RUNTIME_ERROR;
