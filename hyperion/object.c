@@ -6,7 +6,6 @@
 #include "value.h"
 #include "table.h"
 #include "HVM.h"
-#include "chunk.h"
 
 #define ALLOCATE_OBJ(type, objectType) (type*)allocate_object(sizeof(type), objectType)
 
@@ -134,6 +133,18 @@ void print_function(ObjFunction *func) {
   printf("<fn %s>", func->name->chars);
 }
 
+static void print_list(ObjList* list) {
+  printf("[");
+  for (int i = 0; i < list->count - 1; i++) {
+    print_value(list->items[i]);
+    printf(", ");
+  }
+  if (list->count != 0) {
+    print_value(list->items[list->count - 1]);
+  }
+  printf("]");
+}
+
 void print_object(Value value) {
   switch (OBJ_TYPE(value)) {
     case OBJ_BOUND_METHOD:
@@ -160,6 +171,51 @@ void print_object(Value value) {
     case OBJ_UPVALUE:
       printf("upvalue");
       break;
+    case OBJ_LIST:
+      print_list(AS_LIST(value));
+      break;
   }
+}
+
+ObjList* create_list() {
+    ObjList* list = ALLOCATE_OBJ(ObjList, OBJ_LIST);
+    list->items = NULL;
+    list->count = 0;
+    list->capacity = 0;
+    return list;
+}
+
+void push_back_to_list(ObjList* list, Value value) {
+  if (list->capacity < list->count + 1) {
+    int oldCapacity = list->capacity;
+    list->capacity = GROW_CAPACITY(oldCapacity);
+    list->items = GROW_ARRAY(Value, list->items, oldCapacity, list->capacity);
+  }
+  list->items[list->count] = value;
+  list->count++;
+  return;
+}
+
+void store_to_list(ObjList* list, int index, Value value) {
+    list->items[index] = value;
+}
+
+Value index_from_list(ObjList* list, int index) {
+    return list->items[index];
+}
+
+void delete_from_list(ObjList* list, int index) {
+  for (int i = index; i < list->count - 1; i++) {
+    list->items[i] = list->items[i + 1];
+  }
+  list->items[list->count - 1] = NIL_VAL;
+  list->count--;
+}
+
+bool is_valid_list_index(ObjList* list, int index) {
+  if (index < 0 || index > list->count - 1) {
+    return false;
+  }
+  return true;
 }
 

@@ -12,6 +12,7 @@
 #include "std/type_conversion_module/type_conversion.h"
 #include "std/file_io_module/file_io.h"
 #include "std/console_module/console.h"
+#include "std/list_module/list.h"
 // MODULES -->
 
 #include <stdarg.h>
@@ -326,6 +327,64 @@ static InterReport execute() {
 
     uint8_t instruction;
     switch (instruction = READ_BYTE()) {
+      case OP_BUILD_LIST: {
+        ObjList* list = create_list();
+        uint8_t itemCount = READ_BYTE();
+        push(OBJ_VAL(list));
+        for (int i = itemCount; i > 0; i--) {
+          push_back_to_list(list, peek_c(i));
+        }
+        pop();
+        while (itemCount-- > 0) {
+          pop();
+        }
+        push(OBJ_VAL(list));
+        break;
+      }
+      case OP_INDEX_SUBSCR: {
+        Value index = pop();
+        Value indexable = pop();
+        Value result;
+
+        if (!IS_LIST(indexable)) {
+          runtime_error("Invalid type to index into.");
+          return INTER_RUNTIME_ERROR;
+        }
+
+        ObjList* list = AS_LIST(indexable);
+        if (!IS_NUMBER(index)) {
+          runtime_error("List index is not a number.");
+          return INTER_RUNTIME_ERROR;
+        } else if (!is_valid_list_index(list, AS_NUMBER(index))) {
+          runtime_error("List index out of range.");
+          return INTER_RUNTIME_ERROR;
+        }
+        result = index_from_list(list, AS_NUMBER(index));
+        push(result);
+        break;
+      }
+      case OP_STORE_SUBSCR: {
+        Value item = pop();
+        Value index = pop();
+        Value indexable = pop();
+
+         if (!IS_LIST(indexable)) {
+          runtime_error("Cannot store value in a non-list.");
+          return INTER_RUNTIME_ERROR;
+        }
+
+        ObjList* list = AS_LIST(indexable);
+        if (!IS_NUMBER(index)) {
+            runtime_error("List index is not a number.");
+            return INTER_RUNTIME_ERROR;
+        } else if (!is_valid_list_index(list, AS_NUMBER(index))) {
+          runtime_error("List index out of range.");
+          return INTER_RUNTIME_ERROR;
+        }
+        store_to_list(list, AS_NUMBER(index), item);
+        push(item);
+        break;
+      }
       case OP_INVOKE: {
         ObjString* method = READ_STRING();
         int cnt = READ_BYTE();
@@ -483,6 +542,8 @@ static InterReport execute() {
           file_io_module_init();
         } else if (strcmp(name->chars, "console") == 0) {
           console_module_init();
+        } else if (strcmp(name->chars, "list") == 0) {
+          list_module_init();
         } else {
           runtime_error("No Standard Module called '%s'", name->chars);
           return INTER_RUNTIME_ERROR;

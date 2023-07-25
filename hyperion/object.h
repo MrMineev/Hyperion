@@ -20,6 +20,7 @@
 #define IS_CLASS(value) is_obj_type(value, OBJ_CLASS)
 #define IS_INSTANCE(value) is_obj_type(value, OBJ_INSTANCE)
 #define IS_BOUND_METHOD(value) is_obj_type(value, OBJ_BOUND_METHOD)
+#define IS_LIST(value) is_obj_type(value, OBJ_LIST)
 
 #define AS_CLOSURE(value) ((ObjClosure*)AS_OBJ(value))
 #define AS_FUNCTION(value) ((ObjFunction*)AS_OBJ(value))
@@ -29,6 +30,7 @@
 #define AS_CLASS(value) ((ObjClass*)AS_OBJ(value))
 #define AS_INSTANCE(value) ((ObjInstance*)AS_OBJ(value))
 #define AS_BOUND_METHOD(value) ((ObjBoundMethod*)AS_OBJ(value))
+#define AS_LIST(value) ((ObjList*)AS_OBJ(value))
 
 typedef enum {
   OBJ_CLASS,
@@ -39,6 +41,7 @@ typedef enum {
   OBJ_FUNCTION,
   OBJ_NATIVE,
   OBJ_BOUND_METHOD,
+  OBJ_LIST
 } ObjType;
 
 struct Obj {
@@ -101,6 +104,13 @@ typedef struct {
   ObjClosure* method;
 } ObjBoundMethod;
 
+typedef struct {
+  Obj obj;
+  int count;
+  int capacity;
+  Value* items;
+} ObjList;
+
 ObjInstance* create_instance(ObjClass* _class);
 ObjClass* create_class(ObjString *name);
 ObjClosure* create_closure(ObjFunction *function);
@@ -112,6 +122,13 @@ ObjBoundMethod* create_bound_method(Value receiver, ObjClosure* method);
 ObjString* take_string(char* chars, int size);
 ObjString* copy_string(const char* chars, int length);
 void print_object(Value value);
+
+ObjList* create_list();
+void push_back_to_list(ObjList* list, Value value);
+void store_to_list(ObjList* list, int index, Value value);
+Value index_from_list(ObjList* list, int index);
+void delete_from_list(ObjList* list, int index);
+bool is_valid_list_index(ObjList* list, int index);
 
 static inline bool is_obj_type(Value v, ObjType type) {
   return IS_OBJ(v) && AS_OBJ(v)->type == type;

@@ -55,6 +55,12 @@ int debug_instruction(Chunk *chunk, int offset) {
 
   uint8_t instruction = chunk->code[offset];
   switch (instruction) {
+    case OP_BUILD_LIST:
+      return byte_instruction("OP_BUILD_LIST", chunk, offset);
+    case OP_INDEX_SUBSCR:
+      return simple_instruction("OP_INDEX_SUBSCR", offset);
+    case OP_STORE_SUBSCR:
+      return simple_instruction("OP_STORE_SUBSCR", offset);
     case OP_IMPORT_STD:
       return constant_instruction("OP_IMPORT_STD", chunk, offset);
     case OP_IMPORT_MODULE:

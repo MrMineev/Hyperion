@@ -1,7 +1,6 @@
 #include <stdlib.h>
 
 #include "HVM.h"
-#include "object.h"
 #include "compiler.h"
 #include "memory.h"
 
@@ -82,6 +81,13 @@ static void visit_object(Obj* object) {
 #endif
 
   switch (object->type) {
+    case OBJ_LIST: {
+      ObjList* list = (ObjList*)object;
+      for (int i = 0; i < list->count; i++) {
+        mark_memory_slot(list->items[i]);
+      }
+      break;
+    }
     case OBJ_BOUND_METHOD: {
       ObjBoundMethod* bound = (ObjBoundMethod*)object;
       mark_memory_slot(bound->receiver);
@@ -129,6 +135,12 @@ static void free_object(Obj* object) {
 #endif
 
   switch (object->type) {
+    case OBJ_LIST: {
+      ObjList* list = (ObjList*)object;
+      FREE_ARRAY(Value*, list->items, list->count);
+      FREE(ObjList, object);
+      break;
+    }
     case OBJ_BOUND_METHOD:
       FREE(ObjBoundMethod, object);
       break;

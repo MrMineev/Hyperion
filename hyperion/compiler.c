@@ -28,6 +28,7 @@ typedef enum {
   PREC_FACTOR,      // * /
   PREC_UNARY,       // ! -
   PREC_CALL,        // . ()
+  PREC_SUBSCRIPT,   // [] .
   PREC_PRIMARY
 } Precedence;
 
@@ -327,6 +328,43 @@ static void literal(bool can_assign) {
   }
 }
 
+static void subscr(bool canAssign) {
+  parse_precedence(PREC_OR);
+  consume(TOKEN_RIGHT_BRACKET, "Expect ']' after index.");
+
+  if (canAssign && match(TOKEN_EQUAL)) {
+    expression();
+    emit_byte(OP_STORE_SUBSCR);
+  } else {
+    emit_byte(OP_INDEX_SUBSCR);
+  }
+}
+
+static void list(bool canAssign) {
+  int itemCount = 0;
+  if (!check(TOKEN_RIGHT_BRACKET)) {
+    do {
+      if (check(TOKEN_RIGHT_BRACKET)) {
+        break;
+      }
+
+      parse_precedence(PREC_OR);
+
+      if (itemCount == UINT8_COUNT) {
+        error("Cannot have more than 256 items in a list literal.");
+      }
+      itemCount++;
+    } while (match(TOKEN_COMMA));
+  }
+
+  consume(TOKEN_RIGHT_BRACKET, "Expect ']' after list elements.");
+
+  emit_byte(OP_BUILD_LIST);
+  emit_byte(itemCount);
+
+  return;
+}
+
 static void grouping(bool can_assign) {
   expression();
   consume(TOKEN_RIGHT_PAREN, "Expect ')' after expression");
@@ -531,6 +569,8 @@ static void or_(bool canAssign) {
 }
 
 ParseRule rules[] = {
+  [TOKEN_LEFT_BRACKET]  = {list,     subscr, PREC_SUBSCRIPT},
+  [TOKEN_RIGHT_BRACKET] = {NULL,     NULL,   PREC_NONE},
   [TOKEN_LEFT_PAREN]    = {grouping, call,   PREC_CALL},
   [TOKEN_RIGHT_PAREN]   = {NULL,     NULL,   PREC_NONE},
   [TOKEN_LEFT_BRACE]    = {NULL,     NULL,   PREC_NONE}, 

@@ -9,6 +9,9 @@
 #include "value.h"
 
 typedef enum {
+  OP_BUILD_LIST,
+  OP_INDEX_SUBSCR,
+  OP_STORE_SUBSCR,
   OP_POP,
   OP_IMPORT_STD,
   OP_IMPORT_MODULE,

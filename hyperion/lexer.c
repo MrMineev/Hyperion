@@ -213,6 +213,8 @@ Token lex_token() {
     case '/': return create_token(TOKEN_SLASH);
     case '*': return create_token(TOKEN_STAR);
     case '%': return create_token(TOKEN_PERCENT);
+    case '[': return create_token(TOKEN_LEFT_BRACKET);
+    case ']': return create_token(TOKEN_RIGHT_BRACKET);
     case '!':
       return create_token(
           match('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
