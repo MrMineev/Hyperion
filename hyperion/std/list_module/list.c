@@ -38,6 +38,13 @@ static Value erase_native_function(int argCount, Value *args) {
   return NIL_VAL;
 }
 
+static Value init_native_function(int argCount, Value *args) {
+  ObjList *list = create_list();
+  for (int i = 0; i < AS_NUMBER(args[0]); i++) {
+    push_back_to_list(list, args[1]);
+  }
+  return OBJ_VAL(list);
+}
 
 void add_module_list(const char* name, Value (*f)(int, Value*)) {
   set_table(
@@ -56,5 +63,6 @@ void add_module_list(const char* name, Value (*f)(int, Value*)) {
 void list_module_init() {
   add_module_list("list:push_back", push_back_native_function);
   add_module_list("list:erase", erase_native_function);
+  add_module_list("list:init", init_native_function);
 }
 
