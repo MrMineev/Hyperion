@@ -23,22 +23,25 @@ static Value make_string_string(char* str) {
 char* char_to_string(char c) {
     char* str = (char*)malloc(1);
     if (str == NULL) {
-      perror("Memory allocation error");
-      exit(EXIT_FAILURE);
+        perror("Memory allocation error");
+        exit(EXIT_FAILURE);
     }
+
     str[0] = c;
+    str[1] = '\0'; // Null-terminate the string
+
     return str;
 }
 
-static Value chr_native_function(int argCount, Value *args) {
+static Value chr_native_functioN(int argCount, Value *args) {
   return NUMBER_VAL(
     (int)AS_STRING(args[0])->chars[0]
   );
 }
 
 static Value ord_native_function(int argCount, Value *args) {
-  return make_string_string(
-      char_to_string((char)AS_NUMBER(args[0]))
+  return make_strig_string(
+      &(char)AS_NUMBER(args[0])
   );
 }
 
@@ -64,7 +67,5 @@ void add_module_string(const char* name, Value (*f)(int, Value*)) {
 
 void string_module_init() {
   add_module_string("string:len", string_len_native_function);
-  add_module_string("string:ord", ord_native_function);
-  add_module_string("string:chr", chr_native_function);
 }
 
