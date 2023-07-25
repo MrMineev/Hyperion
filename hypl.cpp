@@ -5,6 +5,7 @@
 #include "hyperion/chunk.h"
 #include "hyperion/debug.h"
 #include "hyperion/HVM.h"
+#include "hyperion/commandline.h"
 
 #define COLOR_DEFAULT 0
 #define COLOR_BLACK 30
@@ -84,6 +85,9 @@ static void run_file(const char* path) {
 
 int main(int argc, char* argv[]) {
   init_hvm();
+
+  CLA.argc = argc;
+  CLA.argv = argv;
 
   if (argc == 1) {
     repl();

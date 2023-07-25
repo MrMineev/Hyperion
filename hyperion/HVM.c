@@ -13,6 +13,7 @@
 #include "std/file_io_module/file_io.h"
 #include "std/console_module/console.h"
 #include "std/list_module/list.h"
+#include "std/sys_module/sys.h"
 // MODULES -->
 
 #include <stdarg.h>
@@ -544,6 +545,8 @@ static InterReport execute() {
           console_module_init();
         } else if (strcmp(name->chars, "list") == 0) {
           list_module_init();
+        } else if (strcmp(name->chars, "sys") == 0) {
+          sys_module_init();
         } else {
           runtime_error("No Standard Module called '%s'", name->chars);
           return INTER_RUNTIME_ERROR;
