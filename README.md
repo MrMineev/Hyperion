@@ -48,6 +48,6 @@ if (condition) {
 
 - [ ] Improving Throughput vs Latency
 
-- [ ] Implement Lists and Arrays
+- [x] Implement Lists and Arrays
 
 
