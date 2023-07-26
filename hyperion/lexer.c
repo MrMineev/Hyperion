@@ -116,8 +116,6 @@ static TokenType identifierType() {
       if (lexer.current - lexer.start > 1) {
         switch (lexer.start[1]) {
           case 'l': return search_keyword(2, 2, "se", TOKEN_ELSE);
-          case 'n':
-            return search_keyword(2, 1, "d", TOKEN_END);
         }
       }
       break;
@@ -151,7 +149,6 @@ static TokenType identifierType() {
     case 'o': return search_keyword(1, 1, "r", TOKEN_OR);
     case 'p': return search_keyword(1, 4, "rint", TOKEN_PRINT);
     case 'r': return search_keyword(1, 5, "eturn", TOKEN_RETURN);
-    case 'b': return search_keyword(1, 4, "egin", TOKEN_BEGIN);
     case 's':
       if (lexer.current - lexer.start > 1) {
         switch(lexer.start[1]) {

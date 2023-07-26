@@ -9,7 +9,7 @@ let r = 10000000;
 
 let ttime = 0;
 
-while (math:abs(ttime - 1) > EPS) begin
+while (math:abs(ttime - 1) > EPS) {
   print "== STEP ==";
   print "L = " + type_conv:to_string(l);
   print "R = " + type_conv:to_string(r);
@@ -19,9 +19,9 @@ while (math:abs(ttime - 1) > EPS) begin
   let start = time:clock();
 
   let random = 0;
-  for (let i = 0; i < mid; inc i) begin
+  for (let i = 0; i < mid; inc i) {
     inc random;
-  end
+  }
 
   let endd = time:clock();
 
@@ -29,10 +29,10 @@ while (math:abs(ttime - 1) > EPS) begin
 
   print "TIME = " + type_conv:to_string(ttime);
   
-  if (ttime > 1) begin
+  if (ttime > 1) {
     r = mid;
-  end else begin
+  } else {
     l = mid;
-  end
-end
+  }
+}
 

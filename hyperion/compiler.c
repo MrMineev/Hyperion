@@ -575,8 +575,6 @@ ParseRule rules[] = {
   [TOKEN_RIGHT_PAREN]   = {NULL,     NULL,   PREC_NONE},
   [TOKEN_LEFT_BRACE]    = {NULL,     NULL,   PREC_NONE}, 
   [TOKEN_RIGHT_BRACE]   = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_BEGIN]         = {NULL,     NULL,   PREC_NONE}, 
-  [TOKEN_END]           = {NULL,     NULL,   PREC_NONE},
   [TOKEN_COMMA]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_DOT]           = {NULL,     dot,    PREC_CALL},
   [TOKEN_MINUS]         = {unary,    binary, PREC_TERM},
@@ -657,11 +655,11 @@ static void expression() {
 }
 
 static void block() {
-  while (!check(TOKEN_END) && !check(TOKEN_EOF)) {
+  while (!check(TOKEN_RIGHT_BRACE) && !check(TOKEN_EOF)) {
     declaration();
   }
 
-  consume(TOKEN_END, "Expect '}' after block.");
+  consume(TOKEN_RIGHT_BRACE, "Expect '}' after block.");
 }
 
 static void function(FunctionType type) {
@@ -681,7 +679,7 @@ static void function(FunctionType type) {
     } while (match(TOKEN_COMMA));
   }
   consume(TOKEN_RIGHT_PAREN, "Expect ')' after parameters.");
-  consume(TOKEN_BEGIN, "Expect '{' before function body.");
+  consume(TOKEN_LEFT_BRACE, "Expect '{' before function body.");
   block();
 
   ObjFunction* function = end_compiler();
@@ -721,11 +719,11 @@ static void class_declaration() {
   current_class = &class_compiler;
 
   named_variable(t_class_name, false);
-  consume(TOKEN_BEGIN, "Expect '{' before class body.");
-  while (!check(TOKEN_END) && !check(TOKEN_EOF)) {
+  consume(TOKEN_LEFT_BRACE, "Expect '{' before class body.");
+  while (!check(TOKEN_RIGHT_BRACE) && !check(TOKEN_EOF)) {
     method();
   }
-  consume(TOKEN_END, "Expect '}' after class body.");
+  consume(TOKEN_RIGHT_BRACE, "Expect '}' after class body.");
 
   emit_byte(OP_POP);
 
@@ -987,7 +985,7 @@ static void statement() {
     if_statement();
   } else if (match(TOKEN_RETURN)) {
     return_stmt();
-  } else if (match(TOKEN_BEGIN)) {
+  } else if (match(TOKEN_LEFT_BRACE)) {
     init_scope();
     block();
     destroy_scope();
