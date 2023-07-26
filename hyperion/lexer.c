@@ -112,7 +112,15 @@ static TokenType identifierType() {
   switch (lexer.start[0]) {
     case 'a': return search_keyword(1, 2, "nd", TOKEN_AND);
     case 'c': return search_keyword(1, 4, "lass", TOKEN_CLASS);
-    case 'e': return search_keyword(1, 3, "lse", TOKEN_ELSE);
+    case 'e':
+      if (lexer.current - lexer.start > 1) {
+        switch (lexer.start[1]) {
+          case 'l': return search_keyword(2, 2, "se", TOKEN_ELSE);
+          case 'n':
+            return search_keyword(2, 1, "d", TOKEN_END);
+        }
+      }
+      break;
     case 'f':
       if (lexer.current - lexer.start > 1) {
         switch (lexer.start[1]) {
@@ -143,6 +151,7 @@ static TokenType identifierType() {
     case 'o': return search_keyword(1, 1, "r", TOKEN_OR);
     case 'p': return search_keyword(1, 4, "rint", TOKEN_PRINT);
     case 'r': return search_keyword(1, 5, "eturn", TOKEN_RETURN);
+    case 'b': return search_keyword(1, 4, "egin", TOKEN_BEGIN);
     case 's':
       if (lexer.current - lexer.start > 1) {
         switch(lexer.start[1]) {
@@ -154,7 +163,12 @@ static TokenType identifierType() {
     case 't':
       if (lexer.current - lexer.start > 1) {
         switch (lexer.start[1]) {
-          case 'h': return search_keyword(2, 2, "is", TOKEN_THIS);
+          case 'h':
+            if (lexer.current - lexer.start > 2) {
+              switch (lexer.start[2]) {
+                case 'i': return search_keyword(3, 1, "s", TOKEN_THIS);
+              }
+            }
           case 'r': return search_keyword(2, 2, "ue", TOKEN_TRUE);
         }
       }
