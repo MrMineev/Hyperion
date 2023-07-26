@@ -14,5 +14,6 @@
 
 ObjFunction* compile(const char* source);
 void mark_compiler_roots();
+static uint8_t create_constant(Value c);
 
 #endif

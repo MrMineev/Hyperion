@@ -833,6 +833,35 @@ static void print_stmt() {
   emit_byte(OP_PRINT);
 }
 
+const char* change_string_to_value(const char* input) {
+  size_t input_len = strlen(input);
+  char* output = (char*)malloc(input_len + 1); // Allocate memory for the output string
+  if (output == NULL) {
+    return NULL;
+  }
+  size_t output_index = 0;
+  for (size_t i = 0; i < input_len; i++) {
+    if (input[i] == '"') {
+      output[output_index++] = '_';
+    } else {
+      output[output_index++] = input[i];
+    }
+  }
+  output[output_index] = '\0';
+  return output;
+}
+
+static void cvar_stmt() {
+  Token name = parser.current;
+  name.start = change_string_to_value(name.start);
+  advance();
+  expression();
+
+  define_variable(identifier_constant(&name));
+
+  consume(TOKEN_SEMICOLON, "Expect ';' after value");
+}
+
 static void return_stmt() {
   if (current->type == TYPE_SCRIPT) {
     error("Can't return from top-level code.");
@@ -973,7 +1002,9 @@ static void import_stmt() {
 }
 
 static void statement() {
-  if (match(TOKEN_IMPORT)) {
+  if (match(TOKEN_CVAR)) {
+    cvar_stmt();
+  } else if (match(TOKEN_IMPORT)) {
     import_stmt();
   } else if (match(TOKEN_PRINT)) {
     print_stmt();

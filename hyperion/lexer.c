@@ -111,7 +111,13 @@ static TokenType search_keyword(int start, int size, const char* rest, TokenType
 static TokenType identifierType() {
   switch (lexer.start[0]) {
     case 'a': return search_keyword(1, 2, "nd", TOKEN_AND);
-    case 'c': return search_keyword(1, 4, "lass", TOKEN_CLASS);
+    case 'c':
+      if (lexer.current - lexer.start > 1) {
+        switch (lexer.start[1]) {
+          case 'l': return search_keyword(2, 3, "ass", TOKEN_CLASS);
+          case 'v': return search_keyword(2, 2, "ar", TOKEN_CVAR);
+        }
+      }
     case 'e':
       if (lexer.current - lexer.start > 1) {
         switch (lexer.start[1]) {
