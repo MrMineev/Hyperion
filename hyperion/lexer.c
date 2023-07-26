@@ -179,6 +179,7 @@ static TokenType identifierType() {
     case 'm': return search_keyword(1, 5, "odule", TOKEN_MODULE);
     case 'l': return search_keyword(1, 2, "et", TOKEN_LET);
     case 'w': return search_keyword(1, 4, "hile", TOKEN_WHILE);
+    case 'g': return search_keyword(1, 3, "var", TOKEN_GVAR);
   }
   return TOKEN_IDENTIFIER;
 }

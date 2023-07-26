@@ -642,9 +642,13 @@ static ParseRule* get_rule(TokenType type) {
 
 static void inc_stmt();
 static void decr_stmt();
+static void gvar_stmt();
 
 static void expression() {
-  if (match(TOKEN_INC)) {
+  if (match(TOKEN_GVAR)) {
+    gvar_stmt();
+    return;
+  } else if (match(TOKEN_INC)) {
     inc_stmt();
     return;
   } else if (match(TOKEN_DECR)) {
@@ -929,6 +933,17 @@ static void declaration() {
   }
 
   if (parser.panic_mode) synchronize();
+}
+
+static void gvar_stmt() {
+  Token name = parser.current;
+  name.start = change_string_to_value(name.start);
+  advance();
+
+  emit_bytes(
+      OP_GET_GLOBAL, 
+      identifier_constant(&name)
+  );
 }
 
 static void decr_stmt() {

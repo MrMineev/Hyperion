@@ -12,7 +12,7 @@ typedef enum {
   TOKEN_IMPORT, TOKEN_STD, TOKEN_MODULE,
 
   // Search Functions
-  TOKEN_CVAR,
+  TOKEN_CVAR, TOKEN_GVAR,
 
   // Single-character tokens.
   TOKEN_LEFT_PAREN, TOKEN_RIGHT_PAREN,
