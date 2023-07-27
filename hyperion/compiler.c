@@ -81,7 +81,7 @@ typedef struct {
   bool panic_mode;
 } Parser;
 
-Compiler *current = nullptr;
+Compiler *current = NULL;
 ClassCompiler* current_class = NULL;
 Parser parser;
 
