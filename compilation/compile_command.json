@@ -1,7 +1,7 @@
 {
-  "main": "g++",
+  "main": "gcc",
   "programs": [
-    "hypl.cpp",
+    "hypl.c",
     "hyperion/value.c",
     "hyperion/object.c",
     "hyperion/memory.c",
