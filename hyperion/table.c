@@ -22,7 +22,7 @@ void free_table(Table *table) {
 static Entry* find_entry(Entry *entries, int capacity, ObjString *key) {
   // the core for the hash table
   // for now using linear search
-  uint32_t index = key->hash % capacity;
+  uint32_t index = key->hash & (capacity - 1);
   Entry *tombstone = NULL;
   while (true) {
     Entry* entry = &entries[index];
@@ -35,7 +35,7 @@ static Entry* find_entry(Entry *entries, int capacity, ObjString *key) {
     } else if (entry->key == key) {
       return entry;
     }
-    index = (index + 1) % capacity;
+    index = (index + 1) & (capacity - 1);
   }
 }
 
@@ -105,7 +105,7 @@ void table_add_all(Table *from, Table *to) {
 
 ObjString* table_find_string(Table* table, const char* chars, int size, uint32_t hash) {
   if (table->size == 0) return NULL;
-  uint32_t index = hash % table->capacity;
+  uint32_t index = hash & (table->capacity - 1);
   while (true) {
     Entry* entry = &table->entries[index];
     if (entry->key == NULL) {
@@ -116,7 +116,7 @@ ObjString* table_find_string(Table* table, const char* chars, int size, uint32_t
       return entry->key;
     }
 
-    index = (index + 1) % table->capacity;
+    index = (index + 1) & (table->capacity - 1);
   }
 }
 
