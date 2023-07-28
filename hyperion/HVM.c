@@ -323,8 +323,8 @@ static InterReport execute() {
     printf("\n");
     */
 
-    debug_instruction(&frame->closure->function->chunk,
-        (int)(frame->ip - frame->closure->function->chunk.code));
+    // debug_instruction(&frame->closure->function->chunk,
+        // (int)(frame->ip - frame->closure->function->chunk.code));
 
 #endif
 
