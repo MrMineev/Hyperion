@@ -1,38 +1,7 @@
-import std math;
-import std time;
-import std type_conv;
+let N = 3000000;
 
-let EPS = 0.01;
-
-let l = 0;
-let r = 10000000;
-
-let ttime = 0;
-
-while (math:abs(ttime - 1) > EPS) {
-  print "== STEP ==";
-  print "L = " + type_conv:to_string(l);
-  print "R = " + type_conv:to_string(r);
-
-  let mid = math:floor((l + r) / 2);
-
-  let start = time:clock();
-
-  let random = 0;
-  for (let i = 0; i < mid; inc i) {
-    inc random;
-  }
-
-  let endd = time:clock();
-
-  ttime = endd - start;
-
-  print "TIME = " + type_conv:to_string(ttime);
-  
-  if (ttime > 1) {
-    r = mid;
-  } else {
-    l = mid;
-  }
+let res = 0;
+for (let i = 0; i < N; inc i) {
+  inc res;
 }
-
+print res;

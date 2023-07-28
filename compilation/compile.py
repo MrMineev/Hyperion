@@ -5,12 +5,12 @@ path = "compilation/compile_command.json"
 
 data = json.load(open(path, 'r'))
 
-command = f"g++ "
+command = data['main'] + ' '
 for filepath in data['programs']:
     command += filepath + ' '
 for filepath in data['modules']:
     command += filepath + ' '
-command = f"{command}-o {data['output']}"
+command = f"{command} -o {data['output']}"
 
 print(command)
 
