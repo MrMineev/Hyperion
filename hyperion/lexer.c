@@ -115,7 +115,6 @@ static TokenType identifierType() {
       if (lexer.current - lexer.start > 1) {
         switch (lexer.start[1]) {
           case 'l': return search_keyword(2, 3, "ass", TOKEN_CLASS);
-          case 'v': return search_keyword(2, 2, "ar", TOKEN_CVAR);
         }
       }
     case 'e':
@@ -179,7 +178,6 @@ static TokenType identifierType() {
     case 'm': return search_keyword(1, 5, "odule", TOKEN_MODULE);
     case 'l': return search_keyword(1, 2, "et", TOKEN_LET);
     case 'w': return search_keyword(1, 4, "hile", TOKEN_WHILE);
-    case 'g': return search_keyword(1, 3, "var", TOKEN_GVAR);
   }
   return TOKEN_IDENTIFIER;
 }

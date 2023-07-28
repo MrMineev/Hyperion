@@ -642,13 +642,9 @@ static ParseRule* get_rule(TokenType type) {
 
 static void inc_stmt();
 static void decr_stmt();
-static void gvar_stmt();
 
 static void expression() {
-  if (match(TOKEN_GVAR)) {
-    gvar_stmt();
-    return;
-  } else if (match(TOKEN_INC)) {
+  if (match(TOKEN_INC)) {
     inc_stmt();
     return;
   } else if (match(TOKEN_DECR)) {
@@ -855,17 +851,6 @@ const char* change_string_to_value(const char* input) {
   return output;
 }
 
-static void cvar_stmt() {
-  Token name = parser.current;
-  name.start = change_string_to_value(name.start);
-  advance();
-  expression();
-
-  define_variable(identifier_constant(&name));
-
-  consume(TOKEN_SEMICOLON, "Expect ';' after value");
-}
-
 static void return_stmt() {
   if (current->type == TYPE_SCRIPT) {
     error("Can't return from top-level code.");
@@ -1017,9 +1002,7 @@ static void import_stmt() {
 }
 
 static void statement() {
-  if (match(TOKEN_CVAR)) {
-    cvar_stmt();
-  } else if (match(TOKEN_IMPORT)) {
+  if (match(TOKEN_IMPORT)) {
     import_stmt();
   } else if (match(TOKEN_PRINT)) {
     print_stmt();

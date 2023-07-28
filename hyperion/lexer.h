@@ -11,9 +11,6 @@ typedef enum {
   // Modules & Import
   TOKEN_IMPORT, TOKEN_STD, TOKEN_MODULE,
 
-  // Search Functions
-  TOKEN_CVAR, TOKEN_GVAR,
-
   // Single-character tokens.
   TOKEN_LEFT_PAREN, TOKEN_RIGHT_PAREN,
   TOKEN_LEFT_BRACE, TOKEN_RIGHT_BRACE,
