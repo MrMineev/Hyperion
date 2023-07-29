@@ -8,6 +8,19 @@
 #include "../../HVM.h"
 #include "../../value.h"
 
+static Value to_radians_native_function(int argCount, Value *args) {
+  double PI = 3.14159265;
+  double deg = AS_NUMBER(args[0]);
+  return NUMBER_VAL(
+      deg * PI / 180.0
+  );
+}
+
+static Value e_native_function(int argCount, Value *args) {
+  double e = 2.718281828;
+  return NUMBER_VAL(e);
+}
+
 static Value pi_native_function(int argCount, Value *args) {
   double PI = 3.14159265;
   return NUMBER_VAL(PI);
@@ -74,5 +87,7 @@ void math_module_init() {
   add_module_math("math:sin", sin_native_function);
   add_module_math("math:cos", cos_native_function);
   add_module_math("math:pi", pi_native_function);
+  add_module_math("math:to_radians", to_radians_native_function);
+  add_module_math("math:e", e_native_function);
 }
 
