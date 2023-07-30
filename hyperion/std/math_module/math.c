@@ -30,6 +30,11 @@ static Value e_native_function(int argCount, Value *args) {
   return NUMBER_VAL(e);
 }
 
+static Value golden_ratio_native_function(int argCount, Value *args) {
+  double ratio = 1.6180339887498948;
+  return NUMBER_VAL(ratio);
+}
+
 static Value pi_native_function(int argCount, Value *args) {
   double PI = 3.14159265;
   return NUMBER_VAL(PI);
@@ -98,6 +103,7 @@ void math_module_init() {
   add_module_math("math:pi", pi_native_function);
   add_module_math("math:to_radians", to_radians_native_function);
   add_module_math("math:e", e_native_function);
+  add_module_math("math:golden_ratio", golden_ratio_native_function);
   add_module_math("math:pow", power_native_function);
 }
 
