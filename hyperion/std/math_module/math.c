@@ -46,6 +46,12 @@ static Value cos_native_function(int argCount, Value *args) {
     return NUMBER_VAL(result);
 }
 
+static Value tan_native_function(int argCount, Value *args) {
+  double angle_radians = AS_NUMBER(args[0]);
+  double result = tan(angle_radians);
+  return NUMBER_VAL(result);
+}
+
 static Value sin_native_function(int argCount, Value *args) {
     double angle_radians = AS_NUMBER(args[0]);
     double result = sin(angle_radians);
@@ -100,6 +106,7 @@ void math_module_init() {
   add_module_math("math:abs", abs_native_function);
   add_module_math("math:sin", sin_native_function);
   add_module_math("math:cos", cos_native_function);
+  add_module_math("math:tan", tan_native_function);
   add_module_math("math:pi", pi_native_function);
   add_module_math("math:to_radians", to_radians_native_function);
   add_module_math("math:e", e_native_function);
