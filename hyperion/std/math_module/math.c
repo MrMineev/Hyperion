@@ -85,6 +85,17 @@ static Value floor_native_function(int argCount, Value* args) {
   return NUMBER_VAL((double)r);
 }
 
+int gcd(int a, int b) {
+  if (b == 0) return a;
+  return gcd(b, a % b);
+}
+
+static Value gcd_native_function(int argCount, Value *args) {
+  int n = floor(AS_NUMBER(args[0]));
+  int m = floor(AS_NUMBER(args[1]));
+  return NUMBER_VAL(gcd(n, m));
+}
+
 void add_module_math(const char* name, Value (*f)(int, Value*)) {
   set_table(
       &hvm.globals,
@@ -100,6 +111,7 @@ void add_module_math(const char* name, Value (*f)(int, Value*)) {
 }
 
 void math_module_init() {
+  add_module_math("math:gcd", gcd_native_function);
   add_module_math("math:fac", fac_native_function);
   add_module_math("math:ceil", ceil_native_function);
   add_module_math("math:floor", floor_native_function);
