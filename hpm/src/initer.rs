@@ -1,6 +1,11 @@
-use std::path::PathBuf;
 use std::env;
 use std::fs;
+use std::collections::HashMap;
+use std::fs::File;
+use std::io::Write;
+use std::any::Any;
+
+use serde_json::{json, Value};
 
 pub fn get_project_name() -> Option<String> {
     let current_dir = env::current_dir();
@@ -27,10 +32,28 @@ pub fn create_folder(folder_name: String) -> bool {
 
 pub fn init_hypl() {
     if let Some(project_name) = get_project_name() {
-        if create_folder("__modules__".to_string()) {
-            println!("Success!");
-        } else {
+        if !create_folder("__modules__".to_string()) {
             eprintln!("An error accured while creating the folder {}", project_name);
         }
+        let data = json!({
+            "name": project_name.clone(),
+            "modules": {}
+        });
+
+        let json_string =
+            serde_json::to_string_pretty(&data).expect("Failed to serialize JSON");
+        let mut file = File::create("__info__.json").expect("Failed to create output JSON file");
+        file.write_all(json_string.as_bytes()).expect("Failed to write output JSON file");
     }
 }
+
+
+
+
+
+
+
+
+
+
+
