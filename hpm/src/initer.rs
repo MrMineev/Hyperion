@@ -37,7 +37,7 @@ pub fn init_hypl() {
         }
         let data = json!({
             "name": project_name.clone(),
-            "modules": {}
+            "modules": []
         });
 
         let json_string =
