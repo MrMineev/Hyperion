@@ -1,5 +1,6 @@
 mod initer;
 mod installer;
+mod download_package;
 
 use std::env;
 
