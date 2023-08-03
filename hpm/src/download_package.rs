@@ -1,8 +1,14 @@
 // Import the reqwest crate
 use reqwest::blocking::Client;
+use std::fs;
 use std::fs::File;
 use std::io::{Read, Write};
 use zip::read::ZipArchive;
+
+fn delete_file(file_path: &str) -> Result<(), Box<dyn std::error::Error>> {
+    fs::remove_file(file_path)?;
+    Ok(())
+}
 
 fn unzip_file(zip_path: &str, output_dir: &str) -> Result<(), Box<dyn std::error::Error>> {
     let file = File::open(zip_path)?;
@@ -48,5 +54,7 @@ pub fn download_package(url: String, name: String, output_dir: String) {
         }
     }
     unzip_file(&name, &output_dir);
+
+    delete_file(&name);
 }
 
