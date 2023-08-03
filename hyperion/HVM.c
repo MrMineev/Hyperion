@@ -22,6 +22,20 @@
 #include <string.h>
 #include <stdlib.h>
 
+void replace_character(char* str, char find, char replace) {
+  if (str == NULL) {
+    return; // Handle NULL string case
+  }
+
+  size_t length = strlen(str);
+  for (size_t i = 0; i < length; i++) {
+    if (str[i] == find) {
+      str[i] = replace;
+    }
+  }
+}
+
+
 char* read_file(char* file_path) {
     FILE* file = fopen(file_path, "r");
     if (file == NULL) {
@@ -527,6 +541,7 @@ static InterReport execute() {
         ObjString *name = READ_STRING();
 
         char* module_name = name->chars;
+        replace_character(module_name, '@', '/');
         char* extension = (char*)".hypl";
 
         char* module = (char*)malloc(strlen(module_name) + strlen(extension) + 1);
