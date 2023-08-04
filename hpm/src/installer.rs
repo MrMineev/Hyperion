@@ -36,8 +36,6 @@ fn update(package: String) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = File::create(file_path)?;
     file.write_all(new_contents.as_bytes())?;
 
-    println!("Data updated successfully!");
-
     Ok(())
 }
 
@@ -47,8 +45,6 @@ pub fn install_package() {
     let args: Vec<String> = env::args().collect();
     let package_name: String = args[2].clone();
     let download_link: String = generate_link(hpm_link.clone(), package_name.clone());
-
-    println!("[TODO] install: {}, link: {}", package_name, download_link);
 
     download_package(
         download_link.clone(),

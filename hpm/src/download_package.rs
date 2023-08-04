@@ -43,8 +43,6 @@ pub fn download_package(url: String, name: String, output_dir: String) {
                 let body = response.bytes().expect("Failed to read response body");
                 let mut file = File::create(&name).expect("Failed to create file");
                 file.write_all(&body).expect("Failed to write to file");
-
-                println!("File downloaded successfully!");
             } else {
                 println!("Request failed with status code: {}", response.status());
             }
