@@ -46,6 +46,12 @@ static Value init_native_function(int argCount, Value *args) {
   return OBJ_VAL(list);
 }
 
+static Value len_native_function(int argCount, Value *args) {
+  return NUMBER_VAL(
+      AS_LIST(args[0])->count
+  );
+}
+
 void add_module_list(const char* name, Value (*f)(int, Value*)) {
   set_table(
       &hvm.globals,
@@ -64,5 +70,6 @@ void list_module_init() {
   add_module_list("list:push_back", push_back_native_function);
   add_module_list("list:erase", erase_native_function);
   add_module_list("list:init", init_native_function);
+  add_module_list("list:len", len_native_function);
 }
 
