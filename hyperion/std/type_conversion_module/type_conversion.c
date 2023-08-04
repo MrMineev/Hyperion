@@ -23,7 +23,18 @@ static Value to_string_native_function(int argCount, Value* args) {
   if (IS_NUMBER(args[0])) {
     double c = AS_NUMBER(args[0]);
     char str[100];
-    snprintf(str, 10, "%f", c);
+    int len = snprintf(str, 10, "%f", c);
+
+    if (len > 0) {
+      int i = len - 1;
+      while (i >= 0 && str[i] == '0') {
+        str[i] = '\0';
+        i--;
+      }
+      if (i >= 0 && str[i] == '.') {
+        str[i] = '\0';
+      }
+    }
 
     return make_string(str);
   } else if (IS_BOOL(args[0])) {

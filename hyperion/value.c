@@ -36,7 +36,7 @@ void print_value(Value v) {
   } else if (IS_NIL(value)) {
     printf("nil");
   } else if (IS_NUMBER(value)) {
-    printf("%g", AS_NUMBER(value));
+    printf("%f", AS_NUMBER(value));
   } else if (IS_OBJ(value)) {
     print_object(value);
   }
