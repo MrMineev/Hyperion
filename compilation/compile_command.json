@@ -22,7 +22,8 @@
     "hyperion/std/list_module/list.c",
     "hyperion/std/sys_module/sys.c",
     "hyperion/std/os_module/os.c",
-    "hyperion/std/string_module/string.c"
+    "hyperion/std/string_module/string.c",
+    "hyperion/std/random_module/random.c"
   ],
   "output": "hypl"
 }
