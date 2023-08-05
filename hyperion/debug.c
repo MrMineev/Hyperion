@@ -105,6 +105,8 @@ int debug_instruction(Chunk *chunk, int offset) {
       return constant_instruction("OP_SET_GLOBAL", chunk, offset);
     case OP_NEGATE:
       return simple_instruction("OP_NEGATE", offset);
+    case OP_POWER:
+      return simple_instruction("OP_POWER", offset);
     case OP_MODULE:
       return simple_instruction("OP_MODULE", offset);
     case OP_ADD:

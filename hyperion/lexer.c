@@ -217,6 +217,7 @@ Token lex_token() {
   if (isAlpha(c)) return identifier();
 
   switch (c) {
+    case '^': return create_token(TOKEN_POWER);
     case '(': return create_token(TOKEN_LEFT_PAREN);
     case ')': return create_token(TOKEN_RIGHT_PAREN);
     case '{': return create_token(TOKEN_LEFT_BRACE);
