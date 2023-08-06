@@ -24,6 +24,11 @@ static Value rand_native_function(int argCount, Value *args) {
   return NUMBER_VAL(rand());
 }
 
+static Value srand_native_function(int argCount, Value *args) {
+  srand(AS_NUMBER(args[0]));
+  return NIL_VAL;
+}
+
 void add_module_random(const char* name, Value (*f)(int, Value*)) {
   set_table(
       &hvm.globals,
@@ -40,5 +45,6 @@ void add_module_random(const char* name, Value (*f)(int, Value*)) {
 
 void random_module_init() {
   add_module_random("random:rand", rand_native_function);
+  add_module_random("random:srand", srand_native_function);
 }
 
