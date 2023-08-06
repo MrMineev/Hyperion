@@ -5,6 +5,7 @@
 #include "compiler.h"
 #include "table.h"
 #include "memory.h"
+#include "DMODE.h"
 
 // <-- MODULES
 #include "std/time_module/time.h"
@@ -328,19 +329,18 @@ static InterReport execute() {
 
   while (true) {
 #ifdef DEBUG_TRACE_EXECUTION
-    /*
-    printf("\t");
-    for (Value* pancake = hvm.stack; pancake < hvm.top; pancake++) {
-      printf("[ ");
-      print_value(*pancake);
-      printf(" ]");
+    if (DMODE.mode) {
+      printf("\t");
+      for (Value* pancake = hvm.stack; pancake < hvm.top; pancake++) {
+        printf("[ ");
+        print_value(*pancake);
+        printf(" ]");
+      }
+      printf("\n");
+
+      debug_instruction(&frame->closure->function->chunk,
+          (int)(frame->ip - frame->closure->function->chunk.code));
     }
-    printf("\n");
-    */
-
-    // debug_instruction(&frame->closure->function->chunk,
-        // (int)(frame->ip - frame->closure->function->chunk.code));
-
 #endif
 
     uint8_t instruction;

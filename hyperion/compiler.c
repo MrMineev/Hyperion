@@ -12,6 +12,7 @@
 #include "compiler.h"
 #include "debug.h"
 #include "memory.h"
+#include "DMODE.h"
 
 #define UINT8_COUNT (UINT8_MAX + 1)
 
@@ -238,7 +239,7 @@ static ObjFunction* end_compiler() {
   emit_return();
   ObjFunction* function = current->function;
 #ifdef DEBUG_PRINT_CODE
-  if (!parser.had_error) {
+  if (!parser.had_error && DMODE.mode == true) {
     debug_chunk(get_chunk_compiling(), function->name != NULL
         ? function->name->chars : "<script>");
   }

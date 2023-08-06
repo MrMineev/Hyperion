@@ -11,7 +11,8 @@
     "hyperion/compiler.c",
     "hyperion/lexer.c",
     "hyperion/table.c",
-    "hyperion/commandline.c"
+    "hyperion/commandline.c",
+    "hyperion/DMODE.c"
   ],
   "modules": [
     "hyperion/std/time_module/time.c",
