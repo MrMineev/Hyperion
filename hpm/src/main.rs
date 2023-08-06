@@ -3,18 +3,35 @@ mod installer;
 mod download_package;
 
 use std::env;
+use clap::{App, Arg};
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
+    let matches = App::new("My CLI")
+        .about("A custom package manager CLI.")
+        .version("1.0")
+        .subcommand(
+            App::new("init")
+                .about("Initialize a project.")
+        )
+        .subcommand(
+            App::new("install")
+                .about("Install a package.")
+                .arg(
+                    Arg::with_name("name")
+                        .help("Package name")
+                        .required(true)
+                        .index(1),
+                ),
+        )
+        .get_matches();
 
-    if args[1].to_string() == "init" {
-        // INIT PROJECT
+    if let Some(_) = matches.subcommand_matches("init") {
         initer::init_hypl();
-    } else if args[1].to_string() == "install" {
-        // INSTALL MODULE
-        installer::install_package();
+    } else if let Some(matches) = matches.subcommand_matches("install") {
+        let name = matches.value_of("name").unwrap();
+        installer::install_package(name.to_string());
     } else {
-        println!("Unknown keyword: {}", args[2]);
+        println!("{}", matches.usage());
     }
 }
 
