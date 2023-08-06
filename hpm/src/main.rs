@@ -6,8 +6,8 @@ use std::env;
 use clap::{App, Arg};
 
 fn main() {
-    let matches = App::new("My CLI")
-        .about("A custom package manager CLI.")
+    let matches = App::new("HPM")
+        .about("Hyperion Package Manager")
         .version("1.0")
         .subcommand(
             App::new("init")
