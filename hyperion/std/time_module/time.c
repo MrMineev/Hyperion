@@ -10,7 +10,7 @@
 #include "../../value.h"
 
 static Value clock_native_function(int argCount, Value* args) {
-  return NUMBER_VAL((double)clock() / CLOCKS_PER_SEC);
+  return NUMBER_VAL((double)clock() / 1000000);
 }
 
 void time_module_init() {
