@@ -8,6 +8,14 @@
 #include "../../HVM.h"
 #include "../../value.h"
 
+
+static Value atan2_native_function(int argCount, Value *args) {
+  double y = AS_NUMBER(args[0]);
+  double x = AS_NUMBER(args[1]);
+  return NUMBER_VAL(atan2(x, y));
+}
+
+
 static Value power_native_function(int argCount, Value *args) {
   double x = AS_NUMBER(args[0]);
   double y = AS_NUMBER(args[1]);
@@ -128,6 +136,7 @@ void math_module_init() {
   add_module_math("math:sin", sin_native_function);
   add_module_math("math:cos", cos_native_function);
   add_module_math("math:tan", tan_native_function);
+  add_module_math("math:atan2", atan2_native_function);
   add_module_math("math:pi", pi_native_function);
   add_module_math("math:to_radians", to_radians_native_function);
   add_module_math("math:e", e_native_function);
