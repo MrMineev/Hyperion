@@ -8,36 +8,12 @@
 #include "hyperion/commandline.h"
 #include "hyperion/DMODE.h"
 
-#define COLOR_DEFAULT 0
-#define COLOR_BLACK 30
-#define COLOR_RED 31
-#define COLOR_GREEN 32
-#define COLOR_YELLOW 33
-#define COLOR_BLUE 34
-#define COLOR_MAGENTA 35
-#define COLOR_CYAN 36
-#define COLOR_WHITE 37
-
-void print_colorful(char c, int colorCode) {
-	printf("\033[0;%dm%c\033[0m", colorCode, c);
-}
-
 static void repl() {
 	char line[1024];
 	while (true) {
-		print_colorful('[', COLOR_YELLOW);
-		print_colorful('H', COLOR_YELLOW);
-		print_colorful('Y', COLOR_YELLOW);
-		print_colorful('P', COLOR_YELLOW);
-		print_colorful('L', COLOR_YELLOW);
-		print_colorful(']', COLOR_YELLOW);
-		print_colorful(' ', COLOR_YELLOW);
-		print_colorful('-', COLOR_RED);
-		print_colorful('-', COLOR_RED);
-		print_colorful('>', COLOR_RED);
-		print_colorful(' ', COLOR_YELLOW);
+    printf("[HYPL] ");
 
-		if (!fgets(line, sizeof(line), stdin)) {
+    if (!fgets(line, sizeof(line), stdin)) {
 			printf("\n");
 			break;
 		}
