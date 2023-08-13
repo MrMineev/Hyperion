@@ -46,6 +46,7 @@ typedef enum {
   OP_MINUS,
   OP_MULTI,
   OP_ADD_D,
+  OP_ADD_S,
   OP_MINUS_D,
   OP_MULTI_D,
   OP_MODULE,

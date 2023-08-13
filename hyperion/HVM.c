@@ -651,14 +651,21 @@ static InterReport execute() {
         BINARY_OP(BOOL_VAL, <);
         break;
       case OP_ADD: {
-        if (IS_STRING(peek_c(0)) && IS_STRING(peek_c(1))) {
-          concatenate();
-        } else if (IS_INT(peek_c(0)) && IS_INT(peek_c(1))) {
+        if (IS_INT(peek_c(0)) && IS_INT(peek_c(1))) {
           int b = AS_INT(pop());
           int a = AS_INT(pop());
           push(INT_VAL(a + b));
         } else {
-          runtime_error("Operands must be two integers or two strings.");
+          runtime_error("Operands must be two integers.");
+          return INTER_RUNTIME_ERROR;
+        }
+        break;
+      }
+      case OP_ADD_S: {
+        if (IS_STRING(peek_c(0)) && IS_STRING(peek_c(1))) {
+          concatenate();
+        } else {
+          runtime_error("Operands must be two strings.");
           return INTER_RUNTIME_ERROR;
         }
         break;
@@ -670,6 +677,7 @@ static InterReport execute() {
           push(DOUBLE_VAL(a + b));
         } else {
           runtime_error("Operands must be two doubles.");
+          return INTER_RUNTIME_ERROR;
         }
         break;
       }

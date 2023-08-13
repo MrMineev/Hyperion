@@ -232,7 +232,8 @@ Token lex_token() {
       );
     case '+':
       return create_token(
-        match('.') ? TOKEN_PLUSD : TOKEN_PLUS
+        match('.') ? TOKEN_PLUSD : 
+          (match(',') ? TOKEN_PLUS_COMMA : TOKEN_PLUS)
       );
     case '/':
       return create_token(

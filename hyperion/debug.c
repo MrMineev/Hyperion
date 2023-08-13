@@ -117,6 +117,8 @@ int debug_instruction(Chunk *chunk, int offset) {
       return simple_instruction("OP_DIVIDE", offset);
     case OP_ADD_D:
       return simple_instruction("OP_ADD_D", offset);
+    case OP_ADD_S:
+      return simple_instruction("OP_ADD_S", offset);
     case OP_MINUS_D:
       return simple_instruction("OP_MINUS_D", offset);
     case OP_MULTI_D:

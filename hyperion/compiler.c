@@ -287,6 +287,7 @@ static void binary(bool can_assign) {
     case TOKEN_LESS_EQUAL: emit_bytes(OP_GREATER, OP_NOT); break;
     case TOKEN_PLUS: emit_byte(OP_ADD); break;
     case TOKEN_PLUSD: emit_byte(OP_ADD_D); break;
+    case TOKEN_PLUS_COMMA: emit_byte(OP_ADD_S); break;
     case TOKEN_MINUS: emit_byte(OP_MINUS); break;
     case TOKEN_MINUSD: emit_byte(OP_MINUS_D); break;
     case TOKEN_STAR: emit_byte(OP_MULTI); break;
@@ -592,6 +593,7 @@ ParseRule rules[] = {
   [TOKEN_MINUSD]        = {unary,    binary, PREC_TERM},
   [TOKEN_PLUS]          = {NULL,     binary, PREC_TERM},
   [TOKEN_PLUSD]         = {NULL,     binary, PREC_TERM},
+  [TOKEN_PLUS_COMMA]    = {NULL,     binary, PREC_TERM},
   [TOKEN_POWER]         = {NULL,     binary, PREC_TERM},
   [TOKEN_PERCENT]       = {unary,    binary, PREC_TERM},
   [TOKEN_SEMICOLON]     = {NULL,     NULL,   PREC_NONE},
