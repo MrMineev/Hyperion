@@ -11,7 +11,7 @@
 static void repl() {
 	char line[1024];
 	while (true) {
-    printf("[HYPL] ");
+    printf("[HYPL] >>> ");
 
     if (!fgets(line, sizeof(line), stdin)) {
 			printf("\n");

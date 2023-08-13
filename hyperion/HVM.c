@@ -550,6 +550,10 @@ static InterReport execute() {
         strcat(module, extension);
 
         char* source_content = read_file(module);
+        if (source_content == NULL) {
+          runtime_error("No Module named: '%s'", module);
+          return INTER_RUNTIME_ERROR;
+        }
 
         return interpret(source_content);
       }
