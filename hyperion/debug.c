@@ -115,6 +115,14 @@ int debug_instruction(Chunk *chunk, int offset) {
       return simple_instruction("OP_MULTI", offset);
     case OP_DIVIDE:
       return simple_instruction("OP_DIVIDE", offset);
+    case OP_ADD_D:
+      return simple_instruction("OP_ADD_D", offset);
+    case OP_MINUS_D:
+      return simple_instruction("OP_MINUS_D", offset);
+    case OP_MULTI_D:
+      return simple_instruction("OP_MULTI_D", offset);
+    case OP_DIVIDE_D:
+      return simple_instruction("OP_DIVIDE_D", offset);
     case OP_CONSTANT:
       return constant_instruction("OP_CONSTANT", chunk, offset);
     case OP_TRUE:

@@ -653,26 +653,32 @@ static InterReport execute() {
       case OP_ADD: {
         if (IS_STRING(peek_c(0)) && IS_STRING(peek_c(1))) {
           concatenate();
-        } else if (IS_DOUBLE(peek_c(0)) && IS_DOUBLE(peek_c(1))) {
-          double b = AS_DOUBLE(pop());
-          double a = AS_DOUBLE(pop());
-          push(DOUBLE_VAL(a + b));
         } else if (IS_INT(peek_c(0)) && IS_INT(peek_c(1))) {
           int b = AS_INT(pop());
           int a = AS_INT(pop());
           push(INT_VAL(a + b));
         } else {
-          runtime_error("Operands must be two numbers or two strings.");
+          runtime_error("Operands must be two integers or two strings.");
           return INTER_RUNTIME_ERROR;
         }
         break;
       }
-      case OP_MINUS: {
-        if (IS_INT(peek_c(0))) {
-          BINARY_OP(INT_VAL, -);
+      case OP_ADD_D: {
+        if (IS_DOUBLE(peek_c(0)) && IS_DOUBLE(peek_c(0))) {
+          double b = AS_DOUBLE(pop());
+          double a = AS_DOUBLE(pop());
+          push(DOUBLE_VAL(a + b));
         } else {
-          BINARY_OP(DOUBLE_VAL, -);
+          runtime_error("Operands must be two doubles.");
         }
+        break;
+      }
+      case OP_MINUS: {
+        BINARY_OP(INT_VAL, -);
+        break;
+      }
+      case OP_MINUS_D: {
+        BINARY_OP(DOUBLE_VAL, -);
         break;
       }
       case OP_POWER: {
@@ -702,19 +708,19 @@ static InterReport execute() {
         break;
       }
       case OP_MULTI: {
-        if (IS_INT(peek_c(0))) {
-          BINARY_OP(INT_VAL, *);
-        } else {
-          BINARY_OP(DOUBLE_VAL, *);
-        }
+        BINARY_OP(INT_VAL, *);
+        break;
+      }
+      case OP_MULTI_D: {
+        BINARY_OP(DOUBLE_VAL, *);
         break;
       }
       case OP_DIVIDE: {
-        if (IS_INT(peek_c(0))) {
-          BINARY_OP(INT_VAL, /);
-        } else {
-          BINARY_OP(DOUBLE_VAL, /);
-        }
+        BINARY_OP(INT_VAL, /);
+        break;
+      }
+      case OP_DIVIDE_D: {
+        BINARY_OP(DOUBLE_VAL, /);
         break;
       }
       case OP_RETURN: {

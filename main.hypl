@@ -25,7 +25,7 @@ while (math:abs(r - l) > 1) {
 
   let endd = time:clock();
 
-  ttime = endd - start;
+  ttime = endd -. start;
 
   print "TIME = " + type_conv:to_string(ttime);
   

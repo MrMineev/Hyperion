@@ -286,9 +286,13 @@ static void binary(bool can_assign) {
     case TOKEN_LESS: emit_byte(OP_LESS); break;
     case TOKEN_LESS_EQUAL: emit_bytes(OP_GREATER, OP_NOT); break;
     case TOKEN_PLUS: emit_byte(OP_ADD); break;
+    case TOKEN_PLUSD: emit_byte(OP_ADD_D); break;
     case TOKEN_MINUS: emit_byte(OP_MINUS); break;
+    case TOKEN_MINUSD: emit_byte(OP_MINUS_D); break;
     case TOKEN_STAR: emit_byte(OP_MULTI); break;
+    case TOKEN_STARD: emit_byte(OP_MULTI_D); break;
     case TOKEN_SLASH: emit_byte(OP_DIVIDE); break;
+    case TOKEN_SLASHD: emit_byte(OP_DIVIDE_D); break;
     case TOKEN_PERCENT: emit_byte(OP_MODULE); break;
     case TOKEN_POWER: emit_byte(OP_POWER); break;
     default: return;
@@ -585,12 +589,16 @@ ParseRule rules[] = {
   [TOKEN_COMMA]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_DOT]           = {NULL,     dot,    PREC_CALL},
   [TOKEN_MINUS]         = {unary,    binary, PREC_TERM},
+  [TOKEN_MINUSD]        = {unary,    binary, PREC_TERM},
   [TOKEN_PLUS]          = {NULL,     binary, PREC_TERM},
+  [TOKEN_PLUSD]         = {NULL,     binary, PREC_TERM},
   [TOKEN_POWER]         = {NULL,     binary, PREC_TERM},
   [TOKEN_PERCENT]       = {unary,    binary, PREC_TERM},
   [TOKEN_SEMICOLON]     = {NULL,     NULL,   PREC_NONE},
   [TOKEN_SLASH]         = {NULL,     binary, PREC_FACTOR},
+  [TOKEN_SLASHD]        = {NULL,     binary, PREC_FACTOR},
   [TOKEN_STAR]          = {NULL,     binary, PREC_FACTOR},
+  [TOKEN_STARD]         = {NULL,     binary, PREC_FACTOR},
   [TOKEN_BANG]          = {unary,    NULL,   PREC_NONE},
   [TOKEN_BANG_EQUAL]    = {NULL,     binary, PREC_EQUALITY},
   [TOKEN_EQUAL]         = {NULL,     NULL,   PREC_NONE},

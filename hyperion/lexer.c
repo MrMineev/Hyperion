@@ -226,26 +226,38 @@ Token lex_token() {
     case ';': return create_token(TOKEN_SEMICOLON);
     case ',': return create_token(TOKEN_COMMA);
     case '.': return create_token(TOKEN_DOT);
-    case '-': return create_token(TOKEN_MINUS);
-    case '+': return create_token(TOKEN_PLUS);
-    case '/': return create_token(TOKEN_SLASH);
-    case '*': return create_token(TOKEN_STAR);
+    case '-':
+      return create_token(
+        match('.') ? TOKEN_MINUSD : TOKEN_MINUS
+      );
+    case '+':
+      return create_token(
+        match('.') ? TOKEN_PLUSD : TOKEN_PLUS
+      );
+    case '/':
+      return create_token(
+        match('.') ? TOKEN_SLASHD : TOKEN_SLASH
+      );
+    case '*':
+      return create_token(
+        match('.') ? TOKEN_STARD : TOKEN_STAR
+      );
     case '%': return create_token(TOKEN_PERCENT);
     case '[': return create_token(TOKEN_LEFT_BRACKET);
     case ']': return create_token(TOKEN_RIGHT_BRACKET);
     case '|': return create_token(TOKEN_LINE);
     case '!':
       return create_token(
-          match('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
+        match('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
     case '=':
       return create_token(
-          match('=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
+        match('=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
     case '<':
       return create_token(
-          match('=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
+        match('=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
     case '>':
       return create_token(
-          match('=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
+        match('=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
     case '"': return string();
   }
 
