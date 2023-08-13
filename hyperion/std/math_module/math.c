@@ -67,11 +67,22 @@ static Value sin_native_function(int argCount, Value *args) {
 }
 
 static Value abs_native_function(int argCount, Value* args) {
-  double c = AS_DOUBLE(args[0]);
-  if (c < 0) {
-    return DOUBLE_VAL(-c);
+  if (IS_DOUBLE(args[0])) {
+    double c = AS_DOUBLE(args[0]);
+    if (c < 0) {
+      return DOUBLE_VAL(-c);
+    } else {
+      return DOUBLE_VAL(c);
+    }
+  } else if (IS_INT(args[0])) {
+    int c = AS_INT(args[0]);
+    if (c < 0) {
+      return INT_VAL(-c);
+    } else {
+      return INT_VAL(c);
+    }
   } else {
-    return DOUBLE_VAL(c);
+    return NIL_VAL;
   }
 }
 

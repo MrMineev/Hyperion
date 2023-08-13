@@ -5,16 +5,16 @@ import std type_conv;
 let EPS = 0.01;
 
 let l = 0;
-let r = 10000000;
+let r = 6000000;
 
-let ttime = 0;
+let ttime = 0.0;
 
-while (math:abs(ttime - 1) > EPS) {
+while (math:abs(r - l) > 1) {
   print "== STEP ==";
   print "L = " + type_conv:to_string(l);
   print "R = " + type_conv:to_string(r);
 
-  let mid = math:floor((l + r) / 2);
+  let mid = (l + r) / 2;
 
   let start = time:clock();
 
@@ -29,7 +29,7 @@ while (math:abs(ttime - 1) > EPS) {
 
   print "TIME = " + type_conv:to_string(ttime);
   
-  if (ttime > 1) {
+  if (ttime > 1.0) {
     r = mid;
   } else {
     l = mid;

@@ -618,7 +618,7 @@ static InterReport execute() {
         break;
       }
       case OP_NEGATE: {
-        if (!IS_INT(peek_c(0)) || !IS_DOUBLE(peek_c(0))) {
+        if (!IS_INT(peek_c(0)) && !IS_DOUBLE(peek_c(0))) {
           runtime_error("Operand must be a number.");
           return INTER_RUNTIME_ERROR;
         }
