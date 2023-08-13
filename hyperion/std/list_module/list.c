@@ -23,12 +23,12 @@ static Value push_back_native_function(int argCount, Value* args) {
 }
 
 static Value erase_native_function(int argCount, Value *args) {
-  if (!IS_NUMBER(args[1])) {
+  if (!IS_INT(args[1])) {
     return NIL_VAL;
   }
 
   ObjList* list = AS_LIST(args[0]);
-  int index = AS_NUMBER(args[1]);
+  int index = AS_INT(args[1]);
 
   if (!is_valid_list_index(list, index)) {
       return NIL_VAL;
@@ -40,14 +40,14 @@ static Value erase_native_function(int argCount, Value *args) {
 
 static Value init_native_function(int argCount, Value *args) {
   ObjList *list = create_list();
-  for (int i = 0; i < AS_NUMBER(args[0]); i++) {
+  for (int i = 0; i < AS_INT(args[0]); i++) {
     push_back_to_list(list, args[1]);
   }
   return OBJ_VAL(list);
 }
 
 static Value len_native_function(int argCount, Value *args) {
-  return NUMBER_VAL(
+  return INT_VAL(
       AS_LIST(args[0])->count
   );
 }

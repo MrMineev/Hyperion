@@ -318,13 +318,22 @@ static InterReport execute() {
 #define READ_STRING() AS_STRING(READ_CONSTANT())
 #define BINARY_OP(valueType, op) \
   do { \
-    if (!IS_NUMBER(peek_c(0)) || !IS_NUMBER(peek_c(1))) { \
+    if (!( \
+        (IS_DOUBLE(peek_c(0)) && IS_DOUBLE(peek_c(1))) || \
+        (IS_INT(peek_c(0)) && IS_INT(peek_c(1))) \
+    )) { \
       runtime_error("Operands must be numbers."); \
       return INTER_RUNTIME_ERROR; \
     } \
-    double b = AS_NUMBER(pop()); \
-    double a = AS_NUMBER(pop()); \
-    push(valueType(a op b)); \
+    if (IS_DOUBLE(peek_c(0))) { \
+      double b = AS_DOUBLE(pop()); \
+      double a = AS_DOUBLE(pop()); \
+      push(valueType(a op b)); \
+    } else { \
+      int b = AS_INT(pop()); \
+      int a = AS_INT(pop()); \
+      push(valueType(a op b)); \
+    } \
   } while (false)
 
   while (true) {
@@ -370,14 +379,14 @@ static InterReport execute() {
         }
 
         ObjList* list = AS_LIST(indexable);
-        if (!IS_NUMBER(index)) {
+        if (!IS_INT(index)) {
           runtime_error("List index is not a number.");
           return INTER_RUNTIME_ERROR;
-        } else if (!is_valid_list_index(list, AS_NUMBER(index))) {
+        } else if (!is_valid_list_index(list, AS_INT(index))) {
           runtime_error("List index out of range.");
           return INTER_RUNTIME_ERROR;
         }
-        result = index_from_list(list, AS_NUMBER(index));
+        result = index_from_list(list, AS_INT(index));
         push(result);
         break;
       }
@@ -392,14 +401,14 @@ static InterReport execute() {
         }
 
         ObjList* list = AS_LIST(indexable);
-        if (!IS_NUMBER(index)) {
+        if (!IS_INT(index)) {
             runtime_error("List index is not a number.");
             return INTER_RUNTIME_ERROR;
-        } else if (!is_valid_list_index(list, AS_NUMBER(index))) {
+        } else if (!is_valid_list_index(list, AS_INT(index))) {
           runtime_error("List index out of range.");
           return INTER_RUNTIME_ERROR;
         }
-        store_to_list(list, AS_NUMBER(index), item);
+        store_to_list(list, AS_INT(index), item);
         push(item);
         break;
       }
@@ -609,11 +618,15 @@ static InterReport execute() {
         break;
       }
       case OP_NEGATE: {
-        if (!IS_NUMBER(peek_c(0))) {
+        if (!IS_INT(peek_c(0)) || !IS_DOUBLE(peek_c(0))) {
           runtime_error("Operand must be a number.");
           return INTER_RUNTIME_ERROR;
         }
-        push(NUMBER_VAL(-AS_NUMBER(pop())));
+        if (IS_INT(peek_c(0))) {
+          push(INT_VAL(-AS_INT(pop())));
+        } else {
+          push(DOUBLE_VAL(-AS_DOUBLE(pop())));
+        }
         break;
       }
       case OP_TRUE:
@@ -640,10 +653,14 @@ static InterReport execute() {
       case OP_ADD: {
         if (IS_STRING(peek_c(0)) && IS_STRING(peek_c(1))) {
           concatenate();
-        } else if (IS_NUMBER(peek_c(0)) && IS_NUMBER(peek_c(1))) {
-          double b = AS_NUMBER(pop());
-          double a = AS_NUMBER(pop());
-          push(NUMBER_VAL(a + b));
+        } else if (IS_DOUBLE(peek_c(0)) && IS_DOUBLE(peek_c(1))) {
+          double b = AS_DOUBLE(pop());
+          double a = AS_DOUBLE(pop());
+          push(DOUBLE_VAL(a + b));
+        } else if (IS_INT(peek_c(0)) && IS_INT(peek_c(1))) {
+          int b = AS_INT(pop());
+          int a = AS_INT(pop());
+          push(INT_VAL(a + b));
         } else {
           runtime_error("Operands must be two numbers or two strings.");
           return INTER_RUNTIME_ERROR;
@@ -651,41 +668,53 @@ static InterReport execute() {
         break;
       }
       case OP_MINUS: {
-        BINARY_OP(NUMBER_VAL, -);
+        if (IS_INT(peek_c(0))) {
+          BINARY_OP(INT_VAL, -);
+        } else {
+          BINARY_OP(DOUBLE_VAL, -);
+        }
         break;
       }
       case OP_POWER: {
         do {
-          if (!IS_NUMBER(peek_c(0)) || !IS_NUMBER(peek_c(1))) {
-            runtime_error("Operands must be numbers.");
+          if (!IS_INT(peek_c(0)) || !IS_INT(peek_c(1))) {
+            runtime_error("Operands must be integers.");
             return INTER_RUNTIME_ERROR;
           }
-          int b = (int) AS_NUMBER(pop());
-          int a = (int) AS_NUMBER(pop());
-          double res = (double) (a ^ b);
-          push(NUMBER_VAL(res));
+          int b = AS_INT(pop());
+          int a = AS_INT(pop());
+          int res = (a ^ b);
+          push(INT_VAL(res));
         } while (false);
         break;
       }
       case OP_MODULE: {
         do {
-          if (!IS_NUMBER(peek_c(0)) || !IS_NUMBER(peek_c(1))) {
-            runtime_error("Operands must be numbers.");
+          if (!IS_INT(peek_c(0)) || !IS_INT(peek_c(1))) {
+            runtime_error("Operands must be integers.");
             return INTER_RUNTIME_ERROR;
           }
-          int b = (int) AS_NUMBER(pop());
-          int a = (int) AS_NUMBER(pop());
-          double res = (double) (a % b);
-          push(NUMBER_VAL(res));
+          int b = (int) AS_INT(pop());
+          int a = (int) AS_INT(pop());
+          int res = (a % b);
+          push(INT_VAL(res));
         } while (false);
         break;
       }
       case OP_MULTI: {
-        BINARY_OP(NUMBER_VAL, *);
+        if (IS_INT(peek_c(0))) {
+          BINARY_OP(INT_VAL, *);
+        } else {
+          BINARY_OP(DOUBLE_VAL, *);
+        }
         break;
       }
       case OP_DIVIDE: {
-        BINARY_OP(NUMBER_VAL, /);
+        if (IS_INT(peek_c(0))) {
+          BINARY_OP(INT_VAL, /);
+        } else {
+          BINARY_OP(DOUBLE_VAL, /);
+        }
         break;
       }
       case OP_RETURN: {

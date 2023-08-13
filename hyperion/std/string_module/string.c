@@ -32,19 +32,19 @@ char* char_to_string(char c) {
 
 static Value chr_native_function(int argCount, Value *args) {
   return make_string_string(
-      char_to_string((char)AS_NUMBER(args[0]))
+      char_to_string((char)AS_INT(args[0]))
   );
 }
 
 static Value ord_native_function(int argCount, Value *args) {
-  return NUMBER_VAL(
+  return INT_VAL(
     (int)AS_STRING(args[0])->chars[0]
   );
 }
 
 static Value get_native_function(int argCount, Value *args) {
   int index = ceil(
-    AS_NUMBER(
+    AS_INT(
       args[1]
     )
   );
@@ -56,7 +56,7 @@ static Value get_native_function(int argCount, Value *args) {
 }
 
 static Value string_len_native_function(int argCount, Value *args) {
-  return NUMBER_VAL(
+  return INT_VAL(
     AS_STRING(args[0])->size
   );
 }

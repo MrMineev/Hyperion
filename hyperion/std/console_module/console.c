@@ -33,8 +33,8 @@ static Value get_line_native_function(int argCount, Value* args) {
 }
 
 static Value floor_native_function(int argCount, Value* args) {
-  int r = floor(AS_NUMBER(args[0]));
-  return NUMBER_VAL((double)r);
+  int r = floor(AS_DOUBLE(args[0]));
+  return INT_VAL(r);
 }
 
 void add_module_console(const char* name, Value (*f)(int, Value*)) {

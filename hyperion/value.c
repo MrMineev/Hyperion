@@ -48,8 +48,11 @@ void print_value(Value v) {
     case VAL_BOOL:
       printf(AS_BOOL(v) ? "true" : "false");
       break;
-    case VAL_NUMBER:
-      printf("%g", AS_NUMBER(v));
+    case VAL_DOUBLE:
+      printf("%g", AS_DOUBLE(v));
+      break;
+    case VAL_INT:
+      printf("%i", AS_INT(v));
       break;
     case VAL_NIL:
       printf("nil");
@@ -68,7 +71,8 @@ bool are_equal(Value a, Value b) {
   if (a.type != b.type) return false;
   switch (a.type) {
     case VAL_BOOL: return AS_BOOL(a) == AS_BOOL(b);
-    case VAL_NUMBER: return AS_NUMBER(a) == AS_NUMBER(b);
+    case VAL_DOUBLE: return AS_DOUBLE(a) == AS_DOUBLE(b);
+    case VAL_INT: return AS_INT(a) == AS_INT(b);
     case VAL_OBJ: return AS_OBJ(a) == AS_OBJ(b);
     case VAL_NIL: return true;
     default: return false;

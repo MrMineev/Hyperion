@@ -21,11 +21,11 @@ static Value make_string_os(char* str) {
 }
 
 static Value rand_native_function(int argCount, Value *args) {
-  return NUMBER_VAL(rand());
+  return INT_VAL(rand());
 }
 
 static Value srand_native_function(int argCount, Value *args) {
-  srand(AS_NUMBER(args[0]));
+  srand(AS_INT(args[0]));
   return NIL_VAL;
 }
 

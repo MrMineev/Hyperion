@@ -49,6 +49,7 @@ if (condition) {
 - [ ] Improving Throughput vs Latency
 
 - [x] Implement Lists and Arrays
+- [ ] Add NaN Tagging for Integers
 
 ## Links
 

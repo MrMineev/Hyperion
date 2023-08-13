@@ -372,9 +372,14 @@ static void grouping(bool can_assign) {
   consume(TOKEN_RIGHT_PAREN, "Expect ')' after expression");
 }
 
-static void number_c(bool can_assign) {
+static void double_c(bool can_assign) {
   double value = strtod(parser.previous.start, NULL);
-  emit_constant(NUMBER_VAL(value));
+  emit_constant(DOUBLE_VAL(value));
+}
+
+static void integer_c(bool can_assign) {
+  int value = strtod(parser.previous.start, NULL);
+  emit_constant(INT_VAL(value));
 }
 
 static void string_c(bool can_assign) {
@@ -596,7 +601,8 @@ ParseRule rules[] = {
   [TOKEN_LESS_EQUAL]    = {NULL,     binary, PREC_COMPARISON},
   [TOKEN_IDENTIFIER]    = {variable, NULL,   PREC_NONE},
   [TOKEN_STRING]        = {string_c, NULL,   PREC_NONE},
-  [TOKEN_NUMBER]        = {number_c, NULL,   PREC_NONE},
+  [TOKEN_DOUBLE]        = {double_c, NULL,   PREC_NONE},
+  [TOKEN_INT]           = {integer_c, NULL,   PREC_NONE},
   [TOKEN_AND]           = {NULL,     and_,   PREC_AND},
   [TOKEN_CLASS]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_ELSE]          = {NULL,     NULL,   PREC_NONE},
@@ -951,7 +957,7 @@ static void decr_stmt() {
     }
 
     emit_bytes(getOp, arg);
-    emit_bytes(OP_CONSTANT, create_constant(NUMBER_VAL(-1)));
+    emit_bytes(OP_CONSTANT, create_constant(INT_VAL(-1)));
     emit_byte(OP_ADD);
     emit_bytes(setOp, arg);
   } else {
@@ -976,7 +982,7 @@ static void inc_stmt() {
     }
 
     emit_bytes(getOp, arg);
-    emit_bytes(OP_CONSTANT, create_constant(NUMBER_VAL(1)));
+    emit_bytes(OP_CONSTANT, create_constant(INT_VAL(1)));
     emit_byte(OP_ADD);
     emit_bytes(setOp, arg);
   } else {

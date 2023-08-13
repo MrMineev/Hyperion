@@ -10,87 +10,87 @@
 
 
 static Value atan2_native_function(int argCount, Value *args) {
-  double y = AS_NUMBER(args[0]);
-  double x = AS_NUMBER(args[1]);
-  return NUMBER_VAL(atan2(x, y));
+  double y = AS_DOUBLE(args[0]);
+  double x = AS_DOUBLE(args[1]);
+  return DOUBLE_VAL(atan2(x, y));
 }
 
 
 static Value power_native_function(int argCount, Value *args) {
-  double x = AS_NUMBER(args[0]);
-  double y = AS_NUMBER(args[1]);
+  double x = AS_DOUBLE(args[0]);
+  double y = AS_DOUBLE(args[1]);
 
   double power = pow(x, y);
 
-  return NUMBER_VAL(power);
+  return DOUBLE_VAL(power);
 }
 
 static Value to_radians_native_function(int argCount, Value *args) {
   double PI = 3.14159265;
-  double deg = AS_NUMBER(args[0]);
-  return NUMBER_VAL(
+  double deg = AS_DOUBLE(args[0]);
+  return DOUBLE_VAL(
       deg * PI / 180.0
   );
 }
 
 static Value e_native_function(int argCount, Value *args) {
   double e = 2.718281828;
-  return NUMBER_VAL(e);
+  return DOUBLE_VAL(e);
 }
 
 static Value golden_ratio_native_function(int argCount, Value *args) {
   double ratio = 1.6180339887498948;
-  return NUMBER_VAL(ratio);
+  return DOUBLE_VAL(ratio);
 }
 
 static Value pi_native_function(int argCount, Value *args) {
   double PI = 3.14159265;
-  return NUMBER_VAL(PI);
+  return DOUBLE_VAL(PI);
 }
 
 static Value cos_native_function(int argCount, Value *args) {
-    double angle_radians = AS_NUMBER(args[0]);
+    double angle_radians = AS_DOUBLE(args[0]);
     double result = cos(angle_radians);
-    return NUMBER_VAL(result);
+    return DOUBLE_VAL(result);
 }
 
 static Value tan_native_function(int argCount, Value *args) {
-  double angle_radians = AS_NUMBER(args[0]);
+  double angle_radians = AS_DOUBLE(args[0]);
   double result = tan(angle_radians);
-  return NUMBER_VAL(result);
+  return DOUBLE_VAL(result);
 }
 
 static Value sin_native_function(int argCount, Value *args) {
-    double angle_radians = AS_NUMBER(args[0]);
+    double angle_radians = AS_DOUBLE(args[0]);
     double result = sin(angle_radians);
-    return NUMBER_VAL(result);
+    return DOUBLE_VAL(result);
 }
 
 static Value abs_native_function(int argCount, Value* args) {
-  double c = AS_NUMBER(args[0]);
+  double c = AS_DOUBLE(args[0]);
   if (c < 0) {
-    return NUMBER_VAL(-c);
+    return DOUBLE_VAL(-c);
   } else {
-    return NUMBER_VAL(c);
+    return DOUBLE_VAL(c);
   }
 }
 
 static Value fac_native_function(int argCount, Value* args) {
   int r = 1;
-  for (int i = 1; i <= (int)AS_NUMBER(args[0]); i++) {
+  for (int i = 1; i <= AS_INT(args[0]); i++) {
     r *= i;
   }
-  return NUMBER_VAL((double)r);
+  return INT_VAL(r);
 }
 
 static Value ceil_native_function(int argCount, Value* args) {
-  int r = ceil(AS_NUMBER(args[0]));
-  return NUMBER_VAL((double)r);
+  int r = ceil(AS_DOUBLE(args[0]));
+  return INT_VAL(r);
 }
 
 static Value floor_native_function(int argCount, Value* args) {
-  int r = floor(AS_NUMBER(args[0]));
-  return NUMBER_VAL((double)r);
+  int r = floor(AS_DOUBLE(args[0]));
+  return DOUBLE_VAL((double)r);
 }
 
 int gcd(int a, int b) {
@@ -99,15 +99,15 @@ int gcd(int a, int b) {
 }
 
 static Value gcd_native_function(int argCount, Value *args) {
-  int n = floor(AS_NUMBER(args[0]));
-  int m = floor(AS_NUMBER(args[1]));
-  return NUMBER_VAL(gcd(n, m));
+  int n = AS_INT(args[0]);
+  int m = AS_INT(args[1]);
+  return INT_VAL(gcd(n, m));
 }
 
 static Value lcm_native_function(int argCount, Value *args) {
-  int n = floor(AS_NUMBER(args[0]));
-  int m = floor(AS_NUMBER(args[1]));
-  return NUMBER_VAL(
+  int n = AS_INT(args[0]);
+  int m = AS_INT(args[1]);
+  return INT_VAL(
     n * m / gcd(n, m)
   );
 }

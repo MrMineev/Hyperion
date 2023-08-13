@@ -29,7 +29,7 @@ static Value get_argv_native_function(int argCount, Value *args) {
 }
 
 static Value get_argc_native_function(int argCount, Value *args) {
-  return NUMBER_VAL((double)CLA.argc);
+  return INT_VAL(CLA.argc);
 }
 
 void add_module_sys(const char* name, Value (*f)(int, Value*)) {

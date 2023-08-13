@@ -192,8 +192,9 @@ static Token number() {
   if (peek() == '.' && isDigit(next_peek())) {
     read_char();
     while (isDigit(peek())) read_char();
+    return create_token(TOKEN_DOUBLE);
   }
-  return create_token(TOKEN_NUMBER);
+  return create_token(TOKEN_INT);
 }
 
 static Token string() {
