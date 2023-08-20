@@ -1,1 +1,13 @@
-print "hello " +, "world!";
+import std time;
+import std type_conv;
+
+let start = time:clock();
+
+let r = 0;
+for (let i = 0; i < 2; inc i) {
+  r = r + 1;
+}
+
+let end = time:clock();
+
+print "DUR: " +, type_conv:to_string(end -. start);

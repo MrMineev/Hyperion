@@ -123,6 +123,21 @@ static Value lcm_native_function(int argCount, Value *args) {
   );
 }
 
+static Value log_native_function(int argCount, Value *args) {
+  double b = AS_DOUBLE(args[0]);
+  double n = AS_DOUBLE(args[1]);
+  return DOUBLE_VAL(
+      log(n) / log(b)
+  );
+}
+
+static Value ln_native_function(int argCount, Value *args) {
+  double n = AS_DOUBLE(args[0]);
+  return DOUBLE_VAL(
+      log(n)
+  );
+}
+
 void add_module_math(const char* name, Value (*f)(int, Value*)) {
   set_table(
       &hvm.globals,
@@ -153,5 +168,7 @@ void math_module_init() {
   add_module_math("math:e", e_native_function);
   add_module_math("math:golden_ratio", golden_ratio_native_function);
   add_module_math("math:pow", power_native_function);
+  add_module_math("math:ln", ln_native_function);
+  add_module_math("math:log", log_native_function);
 }
 
